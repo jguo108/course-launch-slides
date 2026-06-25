@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bold Poster — AI少年创造营</title>
+<link href="https://fonts.googleapis.com/css2?family=Shrikhand&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #FFFFFF;
+    --dark: #1C1410;
+    --red: #D8000F;
+    --light: #F5F2EF;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    width: 100%; height: 100%;
+    overflow: hidden;
+    background: var(--bg);
+    font-family: 'Libre Baskerville', serif;
+    color: var(--dark);
+  }
+  .progress {
+    position: fixed; bottom: 0; left: 0; height: 5px;
+    background: var(--red); z-index: 100;
+    transition: width 0.5s cubic-bezier(0.22,1,0.36,1);
+  }
+  .counter {
+    position: fixed; bottom: 18px; right: 24px; z-index: 100;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
+    font-weight: 600; color: var(--dark); opacity: 0.5;
+  }
+  .hint {
+    position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%);
+    z-index: 100; font-family: 'Space Grotesk', sans-serif;
+    font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase;
+    color: var(--dark); opacity: 0; transition: opacity 0.4s ease;
+    background: var(--light); padding: 6px 14px; border-radius: 4px;
+  }
+  body:hover .hint { opacity: 0.5; }
+  .slides { width: 100%; height: 100%; position: relative; }
+  .slide {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column;
+    justify-content: center; align-items: center;
+    opacity: 0; pointer-events: none;
+    transform: translateY(30px) scale(0.98);
+    transition: opacity 0.55s ease, transform 0.55s cubic-bezier(0.22,1,0.36,1);
+    overflow: hidden; padding: 48px 56px;
+  }
+  .slide.active {
+    opacity: 1; pointer-events: all;
+    transform: translateY(0) scale(1);
+  }
+  .font-display { font-family: 'Shrikhand', cursive; }
+  .font-serif { font-family: 'Libre Baskerville', serif; }
+  .font-sans { font-family: 'Space Grotesk', sans-serif; }
+
+  /* HERO */
+  .slide-hero {
+    background: var(--bg);
+    justify-content: flex-start; align-items: flex-start;
+    padding-top: 5vh; padding-left: 7vw;
+  }
+  .hero-meta {
+    font-family: 'Libre Baskerville', serif;
+    font-size: clamp(11px, 1vw, 14px);
+    color: var(--dark); opacity: 0.6;
+    margin-bottom: 1.5vh; letter-spacing: 0.5px;
+  }
+  .hero-title-group {
+    position: relative; width: 100%;
+  }
+  .hero-title {
+    font-family: 'Shrikhand', cursive;
+    font-size: clamp(72px, 16vw, 220px);
+    line-height: 0.88; color: var(--dark); letter-spacing: 1px;
+  }
+  .hero-title.red {
+    color: var(--red);
+    font-size: clamp(84px, 18vw, 260px);
+    line-height: 0.85; transform: rotate(-4deg);
+    display: inline-block; margin-left: -0.5vw; margin-top: -2vh;
+  }
+  .hero-title.bottom {
+    font-size: clamp(64px, 14vw, 200px);
+    line-height: 0.9; transform: rotate(2deg);
+    display: inline-block; margin-top: -1vh;
+  }
+  .hero-tagline {
+    position: absolute; right: 7vw; bottom: 8vh;
+    text-align: right; max-width: 350px;
+  }
+  .hero-tagline .tag-label {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: clamp(10px, 0.9vw, 12px);
+    letter-spacing: 3px; text-transform: uppercase;
+    font-weight: 600; color: var(--red); margin-bottom: 8px;
+  }
+  .hero-tagline .tag-body {
+    font-family: 'Libre Baskerville', serif;
+    font-size: clamp(13px, 1.2vw, 16px);
+    line-height: 1.6; color: var(--dark);
+  }
+  @media (max-width: 768px) {
+    .slide { padding: 32px 24px; }
+    .hero-tagline { position: relative; right: auto; bottom: auto; text-align: left; margin-top: 3vh; max-width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="progress" id="progress" style="width:10%"></div>
+  <div class="counter" id="counter">01 / 01</div>
+  <div class="hint"><span>&#8592;</span> Click or Swipe <span>&#8594;</span></div>
+
+  <div class="slides" id="slides">
+
+    <!-- SLIDE 1: HERO -->
+    <div class="slide slide-hero active" data-index="0">
+      <div class="hero-meta">课程发布会 · 2026</div>
+      <div class="hero-title-group">
+        <div class="hero-title">AI</div>
+        <div class="hero-title red">少年</div>
+        <div class="hero-title bottom">创造营</div>
+      </div>
+      <div class="hero-tagline">
+        <div class="tag-label">Youth Creation Camp</div>
+        <div class="tag-body">用 AI 点燃创造力，让每一个少年成为未来的创造者。</div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    (function() {
+      const slides = document.querySelectorAll('.slide');
+      const progress = document.getElementById('progress');
+      const counter = document.getElementById('counter');
+      const total = slides.length;
+      let current = 0;
+      function show(i) {
+        slides.forEach((s, idx) => s.classList.toggle('active', idx === i));
+        progress.style.width = ((i + 1) / total * 100) + '%';
+        counter.textContent = String(i + 1).padStart(2, '0') + ' / ' + String(total).padStart(2, '0');
+      }
+      function next() { if (current < total - 1) { current++; show(current); } }
+      function prev() { if (current > 0) { current--; show(current); } }
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ' || e.key === 'Enter' || e.key === 'PageDown') {
+          e.preventDefault(); next();
+        } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp' || e.key === 'PageUp') {
+          e.preventDefault(); prev();
+        }
+      });
+      document.addEventListener('click', (e) => {
+        const x = e.clientX;
+        const w = window.innerWidth;
+        if (x > w / 2) next(); else prev();
+      });
+      let tx = 0;
+      document.addEventListener('touchstart', (e) => { tx = e.changedTouches[0].screenX; });
+      document.addEventListener('touchend', (e) => {
+        const dx = e.changedTouches[0].screenX - tx;
+        if (dx < -50) next();
+        else if (dx > 50) prev();
+      });
+      show(0);
+    })();
+  </script>
+</body>
+</html>

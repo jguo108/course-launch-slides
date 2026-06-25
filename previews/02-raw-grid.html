@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RAW GRID — AI少年创造营</title>
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --black: #0a0a0a;
+  --white: #ffffff;
+  --pink: #f2d4cf;
+  --green: #e5edd6;
+  --gray: #f5f5f5;
+  --darkgray: #333333;
+  --border: 3px solid var(--black);
+  --shadow: 6px 6px 0 var(--black);
+  --shadow-sm: 4px 4px 0 var(--black);
+}
+html, body {
+  width: 100%; height: 100%;
+  font-family: 'Segoe UI', system-ui, -apple-system, Helvetica, Arial, sans-serif;
+  background: var(--white);
+  color: var(--black);
+  overflow: hidden;
+}
+.slide-deck {
+  width: 100vw; height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+.slide {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  display: none;
+  background: var(--white);
+  overflow: hidden;
+}
+.slide.active { display: flex; }
+.slide-content {
+  width: 100%; height: 100%;
+  overflow: hidden;
+}
+.t-display {
+  font-size: clamp(48px, 7vw, 96px);
+  font-weight: 900;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+}
+.t-headline {
+  font-size: clamp(32px, 4.5vw, 64px);
+  font-weight: 900;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+}
+.t-title {
+  font-size: clamp(24px, 2.5vw, 36px);
+  font-weight: 800;
+  line-height: 1.2;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+}
+.t-subtitle {
+  font-size: clamp(16px, 1.4vw, 22px);
+  font-weight: 700;
+  line-height: 1.3;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.t-body {
+  font-size: clamp(16px, 1.3vw, 20px);
+  font-weight: 500;
+  line-height: 1.6;
+}
+.t-caption {
+  font-size: clamp(11px, 1vw, 13px);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.b { border: var(--border); }
+.bg-pink { background: var(--pink); }
+.bg-green { background: var(--green); }
+.bg-black { background: var(--black); }
+.bg-white { background: var(--white); }
+.c-white { color: var(--white); }
+.c-black { color: var(--black); }
+.pad-lg { padding: clamp(32px, 4vw, 64px); }
+.pad-md { padding: clamp(20px, 2.5vw, 40px); }
+.pad-sm { padding: clamp(12px, 1.5vw, 20px); }
+.shadow { box-shadow: var(--shadow); }
+.flex { display: flex; }
+.col { flex-direction: column; }
+.center { align-items: center; justify-content: center; }
+.grow { flex: 1; }
+.gap-sm { gap: clamp(8px, 1vw, 16px); }
+.gap-md { gap: clamp(16px, 2vw, 32px); }
+.gap-lg { gap: clamp(24px, 3vw, 48px); }
+.arrow::before { content: "\2192\00a0"; }
+.label {
+  display: inline-block;
+  background: var(--black);
+  color: var(--white);
+  padding: 6px 14px;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.line {
+  width: 60px;
+  height: 4px;
+  background: var(--black);
+}
+
+/* COVER */
+.s1 .slide-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  height: 100%;
+}
+.s1-left {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: clamp(32px, 4vw, 64px);
+  background: var(--pink);
+  border-right: var(--border);
+}
+.s1-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.s1-logo-box {
+  width: 48px; height: 48px;
+  border: var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 900;
+  background: var(--white);
+}
+.s1-brand-text {
+  font-size: 20px;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+}
+.s1-headline { margin-top: auto; margin-bottom: auto; }
+.s1-cta .label { cursor: pointer; }
+.s1-right {
+  display: flex;
+  flex-direction: column;
+}
+.s1-list-item {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  padding: 0 clamp(24px, 3vw, 48px);
+  border-bottom: var(--border);
+  font-size: clamp(18px, 2vw, 28px);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.s1-list-item:last-child { border-bottom: none; }
+.s1-list-item:hover { background: var(--green); }
+.s1-list-item::before {
+  content: "\2192\00a0";
+  margin-right: 12px;
+  font-size: 0.85em;
+}
+</style>
+</head>
+<body>
+
+<div class="slide-deck" id="deck">
+
+<!-- ====== SLIDE 1: COVER ====== -->
+<div class="slide s1 active">
+  <div class="slide-content">
+    <div class="s1-left">
+      <div class="s1-brand">
+        <div class="s1-logo-box">AI</div>
+        <span class="s1-brand-text">创造营</span>
+      </div>
+      <div class="s1-headline">
+        <div class="t-display">AI少年<br>创造营</div>
+      </div>
+      <div class="s1-cta">
+        <span class="label">课程发布会 · 2026</span>
+      </div>
+    </div>
+    <div class="s1-right">
+      <div class="s1-list-item">AI 编程</div>
+      <div class="s1-list-item bg-green">创意工坊</div>
+      <div class="s1-list-item">项目实战</div>
+      <div class="s1-list-item">团队协作</div>
+      <div class="s1-list-item">成果展示</div>
+      <div class="s1-list-item">未来技能</div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /slide-deck -->
+
+<script>
+const slides = document.querySelectorAll('.slide');
+let current = 0;
+const total = slides.length;
+function showSlide(idx) {
+  slides[current].classList.remove('active');
+  current = Math.max(0, Math.min(idx, total - 1));
+  slides[current].classList.add('active');
+}
+function nextSlide() { showSlide(current + 1); }
+function prevSlide() { showSlide(current - 1); }
+function firstSlide() { showSlide(0); }
+function lastSlide() { showSlide(total - 1); }
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowDown' || e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); nextSlide(); }
+  else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') { e.preventDefault(); prevSlide(); }
+  else if (e.key === 'Home') { e.preventDefault(); firstSlide(); }
+  else if (e.key === 'End') { e.preventDefault(); lastSlide(); }
+});
+let touchStartY = 0;
+document.addEventListener('touchstart', e => { touchStartY = e.changedTouches[0].screenY; });
+document.addEventListener('touchend', e => {
+  const touchEndY = e.changedTouches[0].screenY;
+  if (touchStartY - touchEndY > 50) nextSlide();
+  else if (touchEndY - touchStartY > 50) prevSlide();
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,2141 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>探索未知边界 — 用 AI 赋能下一代创始人</title>
+
+    <!-- ===========================================
+         FONTS: Broadside type stack
+         Barlow (display/headings) + IBM Plex Mono (chrome)
+         Noto Serif SC (CJK display) + LXGW WenKai (CJK body) + Noto Sans SC (CJK chrome)
+         =========================================== -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600;700&family=Noto+Serif+SC:wght@400;500;700;900&family=Noto+Sans+SC:wght@400;500&family=LXGW+WenKai&display=swap" rel="stylesheet">
+
+    <style>
+        /* ===========================================
+           CSS CUSTOM PROPERTIES — Broadside Theme
+           Change these values to customize the deck
+           =========================================== */
+        :root {
+            /* --- Broadside Palette --- */
+            --ink-black: #111111;
+            --ink-black-alt: #1A1A18;
+            --fire-orange: #E85D26;
+            --cream: #F0ECE5;
+            --cream-muted: #888880;
+            --cream-hint: #505048;
+            --border-dark: #282826;
+
+            /* Orange-register text overlays */
+            --ink-on-orange-muted: rgba(17, 17, 17, 0.75);
+            --ink-on-orange-hint: rgba(17, 17, 17, 0.55);
+            --ink-on-orange-faint: rgba(17, 17, 17, 0.40);
+            --ink-on-orange-border: rgba(17, 17, 17, 0.20);
+
+            /* Typography (fixed px at 1920×1080 stage) */
+            --font-display: 'Noto Serif SC', 'Barlow', serif;
+            --font-body: 'LXGW WenKai', 'Barlow', serif;
+            --font-chrome: 'Noto Sans SC', 'IBM Plex Mono', sans-serif;
+            --font-mono: 'IBM Plex Mono', monospace;
+
+            --display-size: 240px;
+            --h1-size: 144px;
+            --h2-size: 88px;
+            --h3-size: 54px;
+            --lead-size: 32px;
+            --body-size: 24px;
+            --caption-size: 18px;
+            --label-size: 14px;
+            --stat-value-size: 106px;
+            --quote-mark-size: 192px;
+            --quote-text-size: 72px;
+            --mono-num-size: 21px;
+
+            /* Spacing */
+            --pad-x: 106px;
+            --pad-y: 60px;
+            --gap-lg: 38px;
+            --gap-md: 22px;
+            --gap-sm: 11px;
+
+            /* Motion */
+            --ease-slide: cubic-bezier(0.77, 0, 0.175, 1);
+            --ease-enter: cubic-bezier(0.16, 1, 0.3, 1);
+            --dur-slide: 1.5s;
+            --dur-enter: 0.8s;
+
+            /* Stage background */
+            --stage-bg: #000000;
+        }
+
+        /* ===========================================
+           RESET
+           =========================================== */
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* ===========================================
+           FIXED 16:9 STAGE — viewport-base.css (FULL)
+           =========================================== */
+
+        /* 1. Lock the browser viewport */
+        html, body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            overflow: hidden;
+            background: var(--stage-bg, #000);
+        }
+
+        /* 2. Full-window deck viewport */
+        .deck-viewport {
+            position: fixed;
+            inset: 0;
+            overflow: hidden;
+            background: var(--stage-bg, #000);
+        }
+
+        /* 3. Fixed 16:9 design canvas. JS sets transform. */
+        .deck-stage {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 1920px;
+            height: 1080px;
+            overflow: hidden;
+            transform-origin: 0 0;
+            background: var(--ink-black);
+        }
+
+        /* 4. Slides stack inside the fixed stage */
+        .slide {
+            position: absolute;
+            inset: 0;
+            width: 1920px;
+            height: 1080px;
+            overflow: hidden;
+            display: block;
+            visibility: hidden;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 1.2s var(--ease-slide), visibility 0s 1.2s;
+        }
+
+        .slide.active,
+        .slide.visible {
+            visibility: visible;
+            opacity: 1;
+            pointer-events: auto;
+            z-index: 1;
+            transition: opacity 1.2s var(--ease-slide), visibility 0s 0s;
+        }
+
+        /* 5. Keep media inside authored slide bounds */
+        img, video, canvas, svg {
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        /* 6. Presentation chrome stays outside the slide design system */
+        .deck-controls {
+            position: fixed;
+            left: 50%;
+            bottom: 22px;
+            transform: translateX(-50%);
+            z-index: 1000;
+        }
+
+        /* 7. Print one fixed-size slide per page */
+        @media print {
+            html, body {
+                width: 1920px;
+                height: auto;
+                overflow: visible;
+                background: #fff;
+            }
+            .deck-viewport {
+                position: static;
+                overflow: visible;
+                background: #fff;
+            }
+            .deck-stage {
+                position: static;
+                width: auto;
+                height: auto;
+                transform: none !important;
+                background: none;
+            }
+            .slide {
+                position: relative;
+                display: block !important;
+                visibility: visible !important;
+                opacity: 1 !important;
+                pointer-events: auto !important;
+                width: 1920px;
+                height: 1080px;
+                break-after: page;
+                page-break-after: always;
+            }
+            .slide:last-child {
+                break-after: auto;
+                page-break-after: auto;
+            }
+            .deck-controls {
+                display: none !important;
+            }
+        }
+
+        /* 8. Reduced motion */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.2s !important;
+            }
+        }
+
+        /* ===========================================
+           BROADSIDE — SLIDE REGISTERS
+           Dark register: near-black bg, cream text, orange accent
+           Orange register: fire-orange bg, dark-ink text
+           =========================================== */
+
+        /* --- Dark register (default for content slides) --- */
+        .slide-dark {
+            background: var(--ink-black);
+            color: var(--cream);
+        }
+
+        .slide-dark .headline {
+            color: var(--cream);
+            font-family: var(--font-display);
+            font-weight: 900;
+            line-height: 1.15;
+            letter-spacing: 0;
+        }
+
+        .slide-dark .body-text {
+            color: var(--cream);
+            font-family: var(--font-body);
+            font-weight: 400;
+            line-height: 1.75;
+            font-size: var(--body-size);
+        }
+
+        .slide-dark .text-muted {
+            color: var(--cream-muted);
+        }
+
+        .slide-dark .text-hint {
+            color: var(--cream-hint);
+        }
+
+        /* --- Orange register (cover, chapter, statement, end) --- */
+        .slide-orange {
+            background: var(--fire-orange);
+            color: var(--ink-black);
+        }
+
+        .slide-orange .headline {
+            color: var(--ink-black);
+            font-family: var(--font-display);
+            font-weight: 900;
+            line-height: 1.15;
+            letter-spacing: 0;
+        }
+
+        .slide-orange .body-text {
+            color: var(--ink-on-orange-muted);
+            font-family: var(--font-body);
+            font-weight: 400;
+            line-height: 1.75;
+        }
+
+        .slide-orange .text-muted {
+            color: var(--ink-on-orange-hint);
+        }
+
+        .slide-orange .text-faint {
+            color: var(--ink-on-orange-faint);
+        }
+
+        /* ===========================================
+           BROADSIDE — CHROME BARS (Content slides only)
+           =========================================== */
+        .slide-chrome {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: var(--gap-sm);
+            border-bottom: 1px solid var(--border-dark);
+            margin-bottom: var(--gap-md);
+            height: 36px;
+        }
+
+        .slide-chrome .kicker {
+            font-family: var(--font-chrome);
+            font-size: var(--label-size);
+            font-weight: 500;
+            letter-spacing: 0;
+            color: var(--fire-orange);
+            text-transform: none;  /* CJK: no uppercase */
+        }
+
+        .slide-chrome .page-num {
+            font-family: var(--font-mono);
+            font-size: var(--label-size);
+            font-weight: 500;
+            letter-spacing: 0.1em;
+            color: var(--cream-hint);
+        }
+
+        .slide-foot {
+            padding-top: var(--gap-sm);
+            border-top: 1px solid var(--border-dark);
+            margin-top: var(--gap-md);
+            height: 36px;
+        }
+
+        /* ---- 全局顶部和底部分割线（每张幻灯片自动拥有） ---- */
+        .slide-content {
+            border-top: 1px solid var(--border-dark);
+            border-bottom: 1px solid var(--border-dark);
+        }
+        .slide-content-chrome {
+            border-top: 1px solid var(--border-dark);
+            /* 底部已由 slide-foot 提供，不再重复 */
+        }
+        /* Orange register 配色 */
+        .slide-orange .slide-content,
+        .slide-orange .slide-content-chrome {
+            border-color: var(--ink-on-orange-border);
+        }
+
+        /* Orange-register chrome overrides */
+        .slide-orange .slide-chrome {
+            border-bottom: 1px solid var(--ink-on-orange-border);
+        }
+        .slide-orange .slide-chrome .kicker {
+            color: var(--ink-on-orange-hint);
+        }
+        .slide-orange .slide-chrome .page-num {
+            color: var(--ink-on-orange-faint);
+        }
+        .slide-orange .slide-foot {
+            border-top: 1px solid var(--ink-on-orange-border);
+        }
+
+        /* Declarative slides: suppress chrome */
+        .slide-cover .slide-chrome,
+        .slide-cover .slide-foot,
+        .slide-chapter .slide-chrome,
+        .slide-chapter .slide-foot,
+        .slide-statement .slide-chrome,
+        .slide-statement .slide-foot,
+        .slide-end .slide-chrome,
+        .slide-end .slide-foot {
+            display: none;
+        }
+        .slide-cover .slide-content {
+            border-top: none;
+            border-bottom: none;
+        }
+
+        /* ===========================================
+           BROADSIDE — SIGNATURE ELEMENTS
+           =========================================== */
+
+        /* Stub accent rule: 36×2px orange bar */
+        .rule-accent {
+            width: 36px;
+            height: 2px;
+            background: var(--fire-orange);
+            display: block;
+            flex-shrink: 0;
+        }
+        .slide-orange .rule-accent {
+            background: var(--ink-black);
+        }
+
+        /* Full-width hairline */
+        .rule-full {
+            width: 100%;
+            height: 1px;
+            background: var(--border-dark);
+            display: block;
+        }
+        .slide-orange .rule-full {
+            background: var(--ink-on-orange-border);
+        }
+
+        /* Catalogue number (mono, low opacity) */
+        .catalogue-num {
+            font-family: var(--font-mono);
+            font-size: var(--mono-num-size);
+            font-weight: 500;
+            letter-spacing: 0.1em;
+            color: var(--cream-hint);
+            position: absolute;
+            top: var(--pad-y);
+            left: var(--pad-x);
+        }
+        .slide-orange .catalogue-num {
+            color: var(--ink-on-orange-faint);
+        }
+
+        /* Stat card: top-border-only data block */
+        .stat-card {
+            border-top: 1px solid var(--border-dark);
+            padding: var(--gap-md) var(--gap-md) var(--gap-md) 0;
+        }
+        .slide-orange .stat-card {
+            border-top: 1px solid var(--ink-on-orange-border);
+        }
+        .stat-card .stat-value {
+            font-family: var(--font-display);
+            font-size: var(--stat-value-size);
+            font-weight: 900;
+            line-height: 1;
+            color: var(--fire-orange);
+        }
+        .slide-orange .stat-card .stat-value {
+            color: var(--ink-black);
+        }
+        .stat-card .stat-label {
+            font-family: var(--font-body);
+            font-size: var(--body-size);
+            color: var(--cream);
+            margin-top: var(--gap-sm);
+        }
+        .slide-orange .stat-card .stat-label {
+            color: var(--ink-on-orange-muted);
+        }
+        .stat-card .stat-note {
+            font-family: var(--font-chrome);
+            font-size: var(--caption-size);
+            color: var(--cream-hint);
+            margin-top: 4px;
+        }
+        .slide-orange .stat-card .stat-note {
+            color: var(--ink-on-orange-faint);
+        }
+
+        /* Bullet list with / marker */
+        .bullet-list {
+            list-style: none;
+            padding: 0;
+        }
+        .bullet-list li {
+            font-family: var(--font-body);
+            font-size: var(--lead-size);
+            line-height: 1.7;
+            color: var(--cream);
+            padding-left: 1.2em;
+            position: relative;
+            margin-bottom: var(--gap-md);
+        }
+        .slide-orange .bullet-list li {
+            color: var(--ink-on-orange-muted);
+        }
+        .bullet-list li::before {
+            content: '/';
+            font-family: var(--font-mono);
+            font-weight: 700;
+            color: var(--fire-orange);
+            position: absolute;
+            left: 0;
+        }
+        .slide-orange .bullet-list li::before {
+            color: var(--ink-black);
+            opacity: 0.45;
+        }
+
+        /* ===========================================
+           PILLAR CARDS — 1px bordered cards for three-pillar layout
+           =========================================== */
+        .pillar-card {
+            border: 1px solid var(--border-dark);
+            padding: var(--gap-lg) var(--gap-md);
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            position: relative;
+            transition: border-color 0.3s ease;
+        }
+        .slide.visible .pillar-card {
+            /* Border remains on reveal */
+        }
+
+        .pillar-card .pillar-index {
+            font-family: var(--font-mono);
+            font-size: 72px;
+            font-weight: 700;
+            color: var(--fire-orange);
+            line-height: 1;
+            margin-bottom: var(--gap-sm);
+            letter-spacing: -0.02em;
+        }
+
+        .pillar-card .pillar-title {
+            font-family: var(--font-display);
+            font-size: var(--h3-size);
+            font-weight: 900;
+            color: var(--cream);
+            line-height: 1.2;
+            margin-bottom: var(--gap-sm);
+        }
+
+        .pillar-card .pillar-rule {
+            width: 36px;
+            height: 2px;
+            background: var(--fire-orange);
+            margin-bottom: var(--gap-md);
+            flex-shrink: 0;
+        }
+
+        .pillar-card .pillar-desc {
+            font-family: var(--font-body);
+            font-size: var(--body-size);
+            color: var(--cream-muted);
+            line-height: 1.75;
+            flex: 1;
+        }
+
+        /* Pillar card accent hover effect — subtle border brighten */
+        .slide.visible .pillar-card:hover {
+            border-color: #3a3a38;
+        }
+
+        /* Tag: bordered mono pill */
+        .tag {
+            display: inline-block;
+            font-family: var(--font-chrome);
+            font-size: var(--label-size);
+            font-weight: 500;
+            letter-spacing: 0;
+            color: var(--fire-orange);
+            border: 1px solid var(--fire-orange);
+            padding: 0.3em 0.8em;
+        }
+        .slide-orange .tag {
+            color: var(--ink-on-orange-faint);
+            border-color: var(--ink-on-orange-faint);
+        }
+
+        /* ===========================================
+           BROADSIDE — LAYOUT HELPERS
+           =========================================== */
+
+        /* Content wrapper with standard padding */
+        .slide-content {
+            position: absolute;
+            inset: var(--pad-y) var(--pad-x);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        /* Content with chrome bars */
+        .slide-content-chrome {
+            position: absolute;
+            inset: var(--pad-y) var(--pad-x);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .slide-content-chrome .content-body {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        /* Two-column layout */
+        .layout-two-col {
+            display: flex;
+            flex-direction: row;
+            gap: var(--pad-x);
+            flex: 1;
+            align-items: stretch;
+        }
+
+        .layout-two-col .col {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .layout-two-col .col-divider {
+            width: 1px;
+            background: var(--border-dark);
+            flex-shrink: 0;
+        }
+        .slide-orange .layout-two-col .col-divider {
+            background: var(--ink-on-orange-border);
+        }
+
+        /* Three-column layout */
+        .layout-three-col {
+            display: flex;
+            flex-direction: row;
+            gap: var(--gap-lg);
+            flex: 1;
+            align-items: stretch;
+        }
+
+        .layout-three-col .col {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+        }
+
+        /* Formula display */
+        .formula-display {
+            text-align: center;
+        }
+        .formula-display .formula-term {
+            font-family: var(--font-display);
+            font-size: var(--h2-size);
+            font-weight: 900;
+            color: var(--cream);
+            line-height: 1.2;
+        }
+        .slide-orange .formula-display .formula-term {
+            color: var(--ink-black);
+        }
+        .formula-display .formula-op {
+            font-family: var(--font-mono);
+            font-size: var(--h3-size);
+            font-weight: 700;
+            color: var(--fire-orange);
+            margin: 0 20px;
+        }
+        .slide-orange .formula-display .formula-op {
+            color: var(--ink-black);
+        }
+        .formula-display .formula-eq {
+            font-family: var(--font-mono);
+            font-size: var(--h3-size);
+            font-weight: 700;
+            color: var(--fire-orange);
+        }
+        .slide-orange .formula-display .formula-eq {
+            color: var(--ink-black);
+        }
+        .formula-display .formula-result {
+            font-family: var(--font-display);
+            font-size: var(--display-size);
+            font-weight: 900;
+            color: var(--fire-orange);
+            line-height: 1;
+            margin-top: var(--gap-lg);
+        }
+        .slide-orange .formula-display .formula-result {
+            color: var(--ink-black);
+        }
+
+        /* ===========================================
+           BROADSIDE — COVER / CHAPTER / STATEMENT / END LAYOUTS
+           =========================================== */
+
+        /* Cover slide */
+        .cover-title {
+            font-family: var(--font-display);
+            font-size: var(--h1-size);
+            font-weight: 900;
+            line-height: 1.15;
+            color: var(--ink-black);
+            max-width: 80%;
+        }
+        .cover-subtitle {
+            font-family: var(--font-body);
+            font-size: var(--lead-size);
+            color: var(--ink-on-orange-muted);
+            margin-top: var(--gap-lg);
+            max-width: 60%;
+        }
+
+        /* Chapter slide */
+        .chapter-num-label {
+            font-family: var(--font-mono);
+            font-size: var(--label-size);
+            font-weight: 500;
+            letter-spacing: 0.1em;
+            color: var(--ink-on-orange-faint);
+            margin-bottom: var(--gap-md);
+        }
+        .chapter-title {
+            font-family: var(--font-display);
+            font-size: var(--h1-size);
+            font-weight: 900;
+            line-height: 1.15;
+            color: var(--ink-black);
+            max-width: 70%;
+        }
+        .chapter-desc {
+            font-family: var(--font-body);
+            font-size: var(--lead-size);
+            color: var(--ink-on-orange-muted);
+            margin-top: var(--gap-lg);
+            max-width: 55%;
+        }
+
+        /* Statement/quote slide */
+        .statement-text {
+            font-family: var(--font-display);
+            font-size: var(--h1-size);
+            font-weight: 900;
+            line-height: 1.2;
+            color: var(--ink-black);
+            max-width: 85%;
+        }
+        .statement-sub {
+            font-family: var(--font-body);
+            font-size: var(--lead-size);
+            color: var(--ink-on-orange-muted);
+            margin-top: var(--gap-lg);
+            max-width: 65%;
+        }
+        .statement-attribution {
+            font-family: var(--font-chrome);
+            font-size: var(--label-size);
+            font-weight: 500;
+            color: var(--ink-on-orange-faint);
+            margin-top: var(--gap-lg);
+        }
+
+        /* End slide */
+        .end-title {
+            font-family: var(--font-display);
+            font-size: var(--h1-size);
+            font-weight: 900;
+            line-height: 1.15;
+            color: var(--ink-black);
+        }
+        .end-sub {
+            font-family: var(--font-body);
+            font-size: var(--lead-size);
+            color: var(--ink-on-orange-muted);
+            margin-top: var(--gap-lg);
+        }
+        .end-brand {
+            font-family: var(--font-mono);
+            font-size: var(--label-size);
+            font-weight: 500;
+            letter-spacing: 0.14em;
+            color: var(--ink-on-orange-faint);
+            margin-top: var(--gap-lg);
+        }
+
+        /* ===========================================
+           ANIMATIONS — Broadside editorial reveal
+           =========================================== */
+        .reveal {
+            opacity: 0;
+            transform: translateY(24px);
+            transition: opacity var(--dur-enter) var(--ease-enter),
+                        transform var(--dur-enter) var(--ease-enter);
+        }
+
+        .slide.visible .reveal {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Stagger delays */
+        .reveal:nth-child(1) { transition-delay: 0.1s; }
+        .reveal:nth-child(2) { transition-delay: 0.2s; }
+        .reveal:nth-child(3) { transition-delay: 0.3s; }
+        .reveal:nth-child(4) { transition-delay: 0.4s; }
+        .reveal:nth-child(5) { transition-delay: 0.5s; }
+        .reveal:nth-child(6) { transition-delay: 0.6s; }
+        .reveal:nth-child(7) { transition-delay: 0.7s; }
+
+        /* Fade-left variant for chrome */
+        .reveal-left {
+            opacity: 0;
+            transform: translateX(-20px);
+            transition: opacity 0.4s var(--ease-enter),
+                        transform 0.4s var(--ease-enter);
+        }
+        .slide.visible .reveal-left {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        /* Scale variant for impactful moments */
+        .reveal-scale {
+            opacity: 0;
+            transform: scale(0.92);
+            transition: opacity 0.7s var(--ease-enter),
+                        transform 0.7s var(--ease-enter);
+        }
+        .slide.visible .reveal-scale {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        /* ===========================================
+           INLINE EDITING — JS-controlled visibility
+           =========================================== */
+        .edit-hotzone {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 80px;
+            height: 80px;
+            z-index: 10000;
+            cursor: pointer;
+        }
+
+        .edit-toggle {
+            position: fixed;
+            top: 16px;
+            left: 16px;
+            z-index: 10001;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: 1px solid var(--border-dark);
+            background: var(--ink-black);
+            color: var(--cream);
+            font-size: 20px;
+            cursor: pointer;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .edit-toggle.show,
+        .edit-toggle.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .edit-save-btn {
+            position: fixed;
+            top: 16px;
+            left: 70px;
+            z-index: 10001;
+            padding: 8px 16px;
+            border: none;
+            background: var(--fire-orange);
+            color: var(--ink-black);
+            font-family: var(--font-chrome);
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: 4px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .edit-save-btn.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* Editable text glow */
+        .editable {
+            outline: none;
+            cursor: text;
+            border-radius: 2px;
+            transition: box-shadow 0.2s;
+        }
+        .edit-mode .editable:hover {
+            box-shadow: 0 0 0 1px var(--fire-orange);
+        }
+        .edit-mode .editable:focus {
+            box-shadow: 0 0 0 2px var(--fire-orange);
+            background: rgba(232, 93, 38, 0.08);
+        }
+
+        /* ===========================================
+           EXTERNAL NAV CONTROLS
+           =========================================== */
+        .deck-controls {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .nav-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            border: none;
+            background: var(--cream-hint);
+            opacity: 0.35;
+            cursor: pointer;
+            padding: 0;
+            transition: opacity 0.3s, transform 0.3s;
+        }
+        .nav-dot.active {
+            opacity: 1;
+            transform: scale(1.3);
+            background: var(--fire-orange);
+        }
+
+        .slide-counter {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            color: var(--cream-hint);
+            letter-spacing: 0.05em;
+            margin-left: 8px;
+        }
+
+        /* ===========================================
+           RESPONSIVE: keep 16:9 stage, no content reflow
+           Only adjust external controls
+           =========================================== */
+        @media (max-width: 768px) {
+            .deck-controls {
+                gap: 10px;
+            }
+            .nav-dot {
+                width: 6px;
+                height: 6px;
+            }
+            .slide-counter {
+                font-size: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===========================================
+         INLINE EDITING UI (outside stage)
+         =========================================== -->
+    <div class="edit-hotzone" id="editHotzone"></div>
+    <button class="edit-toggle" id="editToggle" title="编辑模式 (E)">✎</button>
+    <button class="edit-save-btn" id="editSaveBtn">💾 保存</button>
+
+    <!-- ===========================================
+         DECK VIEWPORT
+         =========================================== -->
+    <div class="deck-viewport">
+        <main class="deck-stage" id="deckStage">
+
+            <!-- ===========================================
+                 SLIDE 1 — COVER (Orange register)
+                 Title: 探索未知边界：用 AI 赋能下一代创始人
+                 =========================================== -->
+            <section class="slide slide-cover slide-orange active" data-slide="1">
+                <div class="slide-content" style="align-items:center;text-align:center;">
+                    <h1 class="cover-title reveal" style="max-width:100%;">
+                        探索未知边界
+                    </h1>
+                    <span class="rule-accent reveal" style="margin-top:var(--gap-md)"></span>
+                    <p class="cover-subtitle reveal" style="max-width:100%;">
+                        用 AI 赋能下一代创始人
+                    </p>
+                </div>
+            </section>
+
+            <!-- ===========================================
+                 SLIDE 2 — CHAPTER I (Orange register)
+                 Zach 的神话与时代的分水岭
+                 右侧预留图片占位，稍后替换为 Zach 照片
+                 =========================================== -->
+            <section class="slide slide-dark" data-slide="2">
+                <div class="slide-content" style="flex-direction:row;gap:var(--pad-x);align-items:center;">
+                    <!-- 左侧：文字内容 -->
+                    <div style="flex:1;display:flex;flex-direction:column;justify-content:center;">
+                        <h2 class="headline reveal" style="max-width:100%;font-size:var(--h1-size);line-height:1.15;font-weight:900;">
+                            Zach<br>Yadegari
+                        </h2>
+                        <span class="rule-accent reveal" style="margin-top:var(--gap-md);"></span>
+                        <p class="body-text text-muted reveal" style="max-width:100%;font-size:var(--lead-size);margin-top:var(--gap-lg);">
+                            一个被 15 所名校拒绝的「最惨牛娃」，<br>如何在 19 岁身价过亿
+                        </p>
+                    </div>
+                    <!-- 右侧：图片占位 — 插入真实图片时替换此 div 即可 -->
+                    <div style="flex:1;display:flex;align-items:center;justify-content:center;">
+                        <img src="images/zach.webp"
+                             alt="Zach Yadegari"
+                             style="width:auto;max-width:100%;height:auto;border-radius:12px;display:block;">
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===========================================
+                 SLIDE 3 — CONTENT (Dark register)
+                 Zach: three big stats only
+                 =========================================== -->
+            <section class="slide slide-content-slide slide-dark" data-slide="3">
+                <div class="slide-content-chrome">
+                    <div class="content-body">
+                        <div style="display:flex;flex-direction:row;gap:var(--pad-x);flex:1;align-items:center;justify-content:center;">
+                            <div class="stat-card reveal" style="border:none;flex:1;display:flex;flex-direction:column;align-items:center;text-align:center;padding:0;">
+                                <div class="stat-value" style="font-size:var(--display-size);">4.0</div>
+                                <div class="stat-label" style="font-size:var(--lead-size);color:var(--cream-muted);">GPA</div>
+                            </div>
+                            <div style="width:1px;height:120px;background:var(--border-dark);flex-shrink:0;"></div>
+                            <div class="stat-card reveal" style="border:none;flex:1;display:flex;flex-direction:column;align-items:center;text-align:center;padding:0;">
+                                <div class="stat-value" style="font-size:var(--display-size);">34</div>
+                                <div class="stat-label" style="font-size:var(--lead-size);color:var(--cream-muted);">ACT</div>
+                            </div>
+                            <div style="width:1px;height:120px;background:var(--border-dark);flex-shrink:0;"></div>
+                            <div class="stat-card reveal" style="border:none;flex:1;display:flex;flex-direction:column;align-items:center;text-align:center;padding:0;">
+                                <div class="stat-value" style="font-size:var(--display-size);color:var(--fire-orange);">$100K</div>
+                                <div class="stat-label" style="font-size:var(--lead-size);color:var(--cream-muted);">16 岁</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slide-foot reveal-left"></div>
+                </div>
+            </section>
+
+            <!-- ===========================================
+                 SLIDE 4 — CONTENT (Dark register)
+                 15 rejections — two big numbers
+                 =========================================== -->
+            <section class="slide slide-content-slide slide-dark" data-slide="4">
+                <div class="slide-content-chrome">
+                    <div class="content-body">
+                        <div style="display:flex;flex-direction:row;gap:var(--pad-x);flex:1;align-items:center;justify-content:center;">
+                            <div class="stat-card reveal" style="border:none;flex:1;display:flex;flex-direction:column;align-items:center;text-align:center;padding:0;">
+                                <div class="stat-value" style="font-size:var(--display-size);">15</div>
+                                <div class="stat-label" style="font-size:var(--lead-size);color:var(--cream-muted);">封拒绝信</div>
+                            </div>
+                            <div style="flex:1;display:flex;align-items:center;justify-content:center;">
+                                <img src="images/universities.png"
+                                     alt="被拒绝的大学"
+                                     style="width:140%;height:auto;max-width:none;max-height:150%;border-radius:12px;display:block;object-fit:contain;margin-left:-60px;">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slide-foot reveal-left"></div>
+                </div>
+            </section>
+
+            <!-- ===========================================
+                 NEW SLIDE — Cal AI (Orange register)
+                 Zach 的产品：Cal AI — 预留 Cal AI 截图
+                 =========================================== -->
+            <section class="slide slide-dark" data-slide="cal">
+                <div class="slide-content" style="flex-direction:row;gap:var(--pad-x);align-items:center;">
+                    <!-- 左侧：Cal AI 标题 -->
+                    <div style="flex:1;display:flex;flex-direction:column;justify-content:center;">
+                        <h2 class="headline reveal" style="max-width:100%;font-size:var(--h1-size);line-height:1.1;color:var(--fire-orange);">
+                            Cal AI
+                        </h2>
+                        <span class="rule-accent reveal" style="margin-top:var(--gap-md)"></span>
+                        <p class="body-text text-muted reveal" style="max-width:100%;font-size:var(--h3-size);margin-top:var(--gap-lg);">
+                            AI 驱动的卡路里追踪应用
+                        </p>
+                    </div>
+                    <!-- 右侧：图片占位 — 稍后替换为 Cal AI 截图 -->
+                    <div style="flex:1;display:flex;align-items:center;justify-content:center;">
+                        <!--
+                        TODO: 替换为 Cal AI 真实截图，示例：
+                        <img src="images/cal-ai-screenshot.png"
+                             alt="Cal AI 截图"
+                             style="width:auto;max-width:100%;height:auto;border-radius:16px;display:block;">
+                        -->
+                        <img src="images/calai.webp"
+                             alt="Cal AI"
+                             style="width:auto;max-width:100%;height:auto;border-radius:16px;display:block;">
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===========================================
+                 SLIDE (Cal AI social) — 社交媒体宣传图
+                 紧接 Cal AI 产品介绍之后
+                 =========================================== -->
+            <section class="slide slide-content-slide slide-dark" data-slide="cal-social">
+                <div class="slide-content">
+                    <div class="reveal" style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;flex:1;">
+                        <img src="images/cal-ai-social.jpeg"
+                             alt="Cal AI Social"
+                             style="width:auto;max-width:85%;max-height:85%;border-radius:12px;display:block;object-fit:contain;">
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===========================================
+                 SLIDE 5 — CONTENT (Dark register)
+                 $40M exit — one big number only
+                 =========================================== -->
+            <section class="slide slide-content-slide slide-dark" data-slide="5">
+                <div class="slide-content-chrome">
+                    <div class="content-body">
+                        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;text-align:center;">
+                            <div class="stat-card reveal" style="border:none;padding:0;">
+                                <div class="stat-value" style="font-size:var(--display-size);color:var(--fire-orange);">$40M</div>
+                                <div class="stat-label" style="font-size:var(--h3-size);color:var(--cream-muted);margin-top:var(--gap-lg);">被MyFitnessPal以过亿美元收购</div>
+                                <div class="stat-note" style="font-size:var(--lead-size);color:var(--cream-hint);margin-top:var(--gap-md);">2026 · 19 岁</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slide-foot reveal-left"></div>
+                </div>
+            </section>
+
+            <!-- ===========================================
+                 SLIDE 6 — STATEMENT (Orange register)
+                 Key thesis: "当技术的门槛被 AI 夷为平地..."
+                 =========================================== -->
+            <section class="slide slide-dark" data-slide="6" style="background:var(--ink-black);">
+                <div class="slide-content" style="align-items:center;text-align:center;">
+                    <h2 class="headline reveal" style="font-size:var(--h1-size);line-height:1.2;max-width:100%;color:var(--cream);">
+                        当技术的<span style="color:var(--fire-orange);">门槛</span><br>被 <span style="color:var(--fire-orange);">AI</span> 抹平
+                    </h2>
+                    <span class="rule-accent reveal" style="margin-top:var(--gap-lg)"></span>
+                    <p class="body-text reveal" style="font-size:var(--lead-size);max-width:100%;margin-top:var(--gap-lg);color:var(--cream);">
+                        拉开差距的，不是分数<br>而是商业想法 × 超级行动力
+                    </p>
+                </div>
+            </section>
+
+            <!-- ===========================================
+                 SLIDE 8 — CONTENT (Dark register)
+                 The Formula: AI × 商业直觉 = 超级创始人
+                 =========================================== -->
+            <section class="slide slide-content-slide slide-dark" data-slide="8">
+                <div class="slide-content-chrome">
+                    <div class="content-body">
+                        <div class="formula-display">
+                            <div style="display:flex;align-items:center;justify-content:center;flex-wrap:wrap;">
+                                <span class="formula-term reveal">AI 工具力</span>
+                                <span class="formula-op reveal" style="transition-delay:0.2s;">×</span>
+                                <span class="formula-term reveal" style="transition-delay:0.3s;">商业直觉</span>
+                            </div>
+                            <div class="reveal" style="transition-delay:0.4s;">
+                                <span class="formula-eq" style="font-size:var(--h2-size);">=</span>
+                            </div>
+                            <div class="formula-result reveal" style="transition-delay:0.6s;">
+                                超级创始人
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slide-foot reveal-left"></div>
+                </div>
+            </section>
+
+            <!-- ===========================================
+                SLIDE 9 — CONTENT (Dark register)
+                 Three pillars — 课程理念
+                 =========================================== -->
+            <section class="slide slide-content-slide slide-dark" data-slide="9">
+                <div class="slide-content-chrome">
+                    <div class="content-body">
+                        <p class="reveal" style="font-family:var(--font-display);font-size:100px;font-weight:900;letter-spacing:0.02em;color:var(--fire-orange);text-align:center;margin-top:100px;margin-bottom:0px;">课程理念</p>
+                        <p class="reveal" style="font-family:var(--font-chrome);font-size:var(--lead-size);font-weight:400;letter-spacing:0.16em;color:var(--cream-hint);text-align:center;margin-bottom:20px;text-transform:uppercase;">PHILOSOPHY</p>
+                        <div style="display:flex;flex-direction:row;gap:var(--gap-lg);flex:1;align-items:center;">
+                            <div class="pillar-card reveal" style="transition-delay:0.1s;align-items:center;text-align:center;justify-content:center;">
+                                <div class="pillar-index" style="font-size:var(--h1-size);">01</div>
+                                <div class="pillar-title" style="font-size:var(--h2-size);">心智转变</div>
+                                <div style="font-family:var(--font-chrome);font-size:var(--lead-size);color:var(--cream-hint);letter-spacing:0.04em;margin-top:var(--gap-sm);">MINDSET</div>
+                            </div>
+                            <div class="pillar-card reveal" style="transition-delay:0.25s;align-items:center;text-align:center;justify-content:center;">
+                                <div class="pillar-index" style="font-size:var(--h1-size);">02</div>
+                                <div class="pillar-title" style="font-size:var(--h2-size);">与AI共创</div>
+                                <div style="font-family:var(--font-chrome);font-size:var(--lead-size);color:var(--cream-hint);letter-spacing:0.04em;margin-top:var(--gap-sm);">CO-CREATION</div>
+                            </div>
+                            <div class="pillar-card reveal" style="transition-delay:0.4s;align-items:center;text-align:center;justify-content:center;">
+                                <div class="pillar-index" style="font-size:var(--h1-size);">03</div>
+                                <div class="pillar-title" style="font-size:var(--h2-size);">产品思维</div>
+                                <div style="font-family:var(--font-chrome);font-size:var(--lead-size);color:var(--cream-hint);letter-spacing:0.04em;margin-top:var(--gap-sm);">PRODUCT THINKING</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slide-foot reveal-left"></div>
+                </div>
+            </section>
+
+            <!-- ===========================================
+                 SLIDE 10 — STATEMENT (Dark register)
+                 从消费者到创造者 — 心智转变 · MINDSET 开场
+                 =========================================== -->
+            <section class="slide slide-dark" data-slide="10" style="background:var(--ink-black);">
+                <div class="slide-content" style="align-items:center;text-align:center;">
+                    <!-- 编号标签，与第9页 pillar 卡片风格统一 -->
+                    <div class="reveal" style="font-family:var(--font-mono);font-size:var(--h3-size);font-weight:700;color:var(--fire-orange);margin-bottom:var(--gap-md);letter-spacing:-0.02em;">
+                        01
+                    </div>
+                    <!-- 副标题在上 -->
+                    <p class="body-text text-muted reveal" style="font-size:var(--lead-size);margin-bottom:var(--gap-md);">
+                        心智转变 · MINDSET
+                    </p>
+                    <!-- 主标题，同一行 -->
+                    <h2 class="headline reveal" style="font-size:var(--h1-size);line-height:1.2;">
+                        从<span style="color:var(--fire-orange);">消费者</span>到<span style="color:var(--fire-orange);">创造者</span>
+                    </h2>
+                    <span class="rule-accent reveal" style="margin-top:var(--gap-lg)"></span>
+                </div>
+            </section>
+
+            <!-- ===========================================
+                 SLIDE 10a — CONTENT (Dark register)
+                 Step 1: 让豆包给我写作业 ≠ AI Native
+                 =========================================== -->
+            <section class="slide slide-content-slide slide-dark" data-slide="10a">
+                <div class="slide-content-chrome">
+                    <div class="content-body">
+                        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;text-align:center;">
+                            <h2 class="headline reveal" style="font-size:var(--h2-size);">
+                                豆包帮我写作业 <span style="font-family:var(--font-mono);color:var(--cream-hint);font-weight:400;">≠</span> <span style="color:var(--fire-orange);">AI Native</span>
+                            </h2>
+                        </div>
+                    </div>
+                    <div class="slide-foot reveal-left"></div>
+                </div>
+            </section>
+
+            <!-- ===========================================
+                SLIDE 10b — CONTENT (Dark register)
+                 Step 2: 解决自己生活里的小麻烦
+                 =========================================== -->
+            <section class="slide slide-content-slide slide-dark" data-slide="10b">
+                <div class="slide-content-chrome">
+                    <div class="content-body">
+                        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;text-align:center;">
+                            <h2 class="headline reveal" style="font-size:var(--h2-size);">
+                                解决生活里的<span style="color:var(--fire-orange);">小麻烦</span>
+                            </h2>
+                        </div>
+                    </div>
+                    <div class="slide-foot reveal-left"></div>
+                </div>
+            </section>
+
+            <!-- ===========================================
+                 SLIDE 10c — CONTENT (Dark register)
+                 Step 3: 创造社会价值
+                 =========================================== -->
+            <section class="slide slide-content-slide slide-dark" data-slide="10c">
+                <div class="slide-content-chrome">
+                    <div class="content-body">
+                        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;text-align:center;">
+                            <h2 class="headline reveal" style="font-size:var(--h2-size);">
+                                创造<span style="color:var(--fire-orange);">社会价值</span>
+                            </h2>
+                        </div>
+                    </div>
+                    <div class="slide-foot reveal-left"></div>
+                </div>
+            </section>
+
+            <!-- ===========================================
+                SLIDE 11 — STATEMENT (Dark register)
+                 AI共创 · CO-CREATION
+                 =========================================== -->
+            <section class="slide slide-dark" data-slide="11" style="background:var(--ink-black);">
+                <div class="slide-content" style="align-items:center;text-align:center;">
+                    <div class="reveal" style="font-family:var(--font-mono);font-size:var(--h3-size);font-weight:700;color:var(--fire-orange);margin-bottom:var(--gap-md);letter-spacing:-0.02em;">
+                        02
+                    </div>
+                    <p class="body-text text-muted reveal" style="font-size:var(--lead-size);margin-bottom:var(--gap-md);">
+                        与AI共创 · CO-CREATION
+                    </p>
+                    <h2 class="headline reveal" style="font-size:var(--h1-size);line-height:1.2;">
+                        我来<span style="color:var(--fire-orange);">想</span>，AI来<span style="color:var(--fire-orange);">做</span>
+                    </h2>
+                    <span class="rule-accent reveal" style="margin-top:var(--gap-lg)"></span>
+                </div>
+            </section>
+
+            <!-- ===========================================
+                SLIDE 11a — CONTENT (Dark register)
+                 Step 1: 我来想，你来做
+                 =========================================== -->
+            <section class="slide slide-content-slide slide-dark" data-slide="11a">
+                <div class="slide-content-chrome">
+                    <div class="content-body">
+                        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;text-align:center;">
+                            <h2 class="headline reveal" style="font-size:var(--h2-size);">
+                                “怎么把一头<span style="color:var(--fire-orange);">大象</span>装进<span style="color:var(--fire-orange);">冰箱</span>里？”
+                            </h2>
+                        </div>
+                    </div>
+                    <div class="slide-foot reveal-left"></div>
+                </div>
+            </section>
+
+            <!-- ===========================================
+                 SLIDE 11a-elephant — 大象装进冰箱配图
+                 =========================================== -->
+            <section class="slide slide-content-slide slide-dark" data-slide="11a-elephant">
+                <div class="slide-content">
+                    <div class="reveal" style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;flex:1;">
+                        <img src="images/elephant.jpeg"
+                             alt="大象装进冰箱"
+                             style="width:auto;max-width:65%;max-height:70%;border-radius:12px;display:block;object-fit:contain;">
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===========================================
+                 SLIDE 11b — CONTENT (Dark register)
+                 Step 2: 把话给讲清楚了
+                 =========================================== -->
+            <section class="slide slide-content-slide slide-dark" data-slide="11b">
+                <div class="slide-content-chrome">
+                    <div class="content-body">
+                        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;text-align:center;">
+                            <h2 class="headline reveal" style="font-size:var(--h2-size);">
+                                把话<span style="color:var(--fire-orange);">讲清楚</span>
+                            </h2>
+                        </div>
+                    </div>
+                    <div class="slide-foot reveal-left"></div>
+                </div>
+            </section>
+
+            <!-- ===========================================
+                 SLIDE 11b-miscommunication — 沟通误会配图
+                 =========================================== -->
+            <section class="slide slide-content-slide slide-dark" data-slide="11b-mis">
+                <div class="slide-content">
+                    <div class="reveal" style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;flex:1;">
+                        <img src="images/miscommunication.png"
+                             alt="沟通误会"
+                             style="width:auto;max-width:75%;max-height:80%;border-radius:12px;display:block;object-fit:contain;">
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===========================================
+                 SLIDE 11c — CONTENT (Dark register)
+                 Step 3: 出了问题一起来解决
+                 =========================================== -->
+            <section class="slide slide-content-slide slide-dark" data-slide="11c">
+                <div class="slide-content-chrome">
+                    <div class="content-body">
+                        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;text-align:center;">
+                            <h2 class="headline reveal" style="font-size:var(--h2-size);">
+                                出了问题<span style="color:var(--fire-orange);">一起来解决</span>
+                            </h2>
+                        </div>
+                    </div>
+                    <div class="slide-foot reveal-left"></div>
+                </div>
+            </section>
+
+            <!-- ===========================================
+                 SLIDE 11c-yourback — 出了问题一起解决配图
+                 =========================================== -->
+            <section class="slide slide-content-slide slide-dark" data-slide="11c-yourback">
+                <div class="slide-content">
+                    <div class="reveal" style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;flex:1;">
+                        <img src="images/your-back.png"
+                             alt="Your Back"
+                             style="width:auto;max-width:65%;max-height:70%;border-radius:12px;display:block;object-fit:contain;">
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===========================================
+                 SLIDE 12 — STATEMENT (Dark register)
+                 产品思维 · PRODUCT THINKING
+                 =========================================== -->
+            <section class="slide slide-dark" data-slide="12" style="background:var(--ink-black);">
+                <div class="slide-content" style="align-items:center;text-align:center;">
+                    <div class="reveal" style="font-family:var(--font-mono);font-size:var(--h3-size);font-weight:700;color:var(--fire-orange);margin-bottom:var(--gap-md);letter-spacing:-0.02em;">
+                        03
+                    </div>
+                    <p class="body-text text-muted reveal" style="font-size:var(--lead-size);margin-bottom:var(--gap-md);">
+                        产品思维 · PRODUCT THINKING
+                    </p>
+                    <h2 class="headline reveal" style="font-size:var(--h1-size);line-height:1.2;">
+                        不做<span style="color:var(--fire-orange);">玩具</span>，做<span style="color:var(--fire-orange);">产品</span>
+                    </h2>
+                    <span class="rule-accent reveal" style="margin-top:var(--gap-lg)"></span>
+                </div>
+            </section>
+
+            <!-- ===========================================
+                 SLIDE 12a — CONTENT (Dark register)
+                 Step 1: 大家都在吐槽什么
+                 =========================================== -->
+            <section class="slide slide-content-slide slide-dark" data-slide="12a">
+                <div class="slide-content-chrome">
+                    <div class="content-body">
+                        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;text-align:center;">
+                            <h2 class="headline reveal" style="font-size:var(--h2-size);">
+                                大家都在<span style="color:var(--fire-orange);">吐槽</span>什么
+                            </h2>
+                        </div>
+                    </div>
+                    <div class="slide-foot reveal-left"></div>
+                </div>
+            </section>
+
+            <!-- ===========================================
+                 SLIDE 12a-reddit — 吐槽配图
+                 =========================================== -->
+            <section class="slide slide-content-slide slide-dark" data-slide="12a-reddit">
+                <div class="slide-content">
+                    <div class="reveal" style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;flex:1;">
+                        <img src="images/reddit.jpeg"
+                             alt="Reddit 吐槽"
+                             style="width:auto;max-width:65%;max-height:70%;border-radius:12px;display:block;object-fit:contain;">
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===========================================
+                SLIDE 12b — CONTENT (Dark register)
+                 Step 2: 你做的东西sexy吗？
+                 =========================================== -->
+            <section class="slide slide-content-slide slide-dark" data-slide="12b">
+                <div class="slide-content-chrome">
+                    <div class="content-body">
+                        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;text-align:center;">
+                            <h2 class="headline reveal" style="font-size:var(--h2-size);">
+                                你做的东西 <span style="color:var(--fire-orange);">吸引人</span> 吗？
+                            </h2>
+                        </div>
+                    </div>
+                    <div class="slide-foot reveal-left"></div>
+                </div>
+            </section>
+
+            <!-- ===========================================
+                 SLIDE 12b-attractive — 吸引人配图
+                 =========================================== -->
+            <section class="slide slide-content-slide slide-dark" data-slide="12b-attractive">
+                <div class="slide-content">
+                    <div class="reveal" style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;flex:1;">
+                        <img src="images/attractive.png"
+                             alt="Attractive"
+                             style="width:auto;max-width:76%;max-height:81%;border-radius:12px;display:block;object-fit:contain;">
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===========================================
+                 SLIDE 12c — CONTENT (Dark register)
+                 Step 3: 先做一坨垃圾，再慢慢改进
+                 =========================================== -->
+            <section class="slide slide-content-slide slide-dark" data-slide="12c">
+                <div class="slide-content-chrome">
+                    <div class="content-body">
+                        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;text-align:center;">
+                            <h2 class="headline reveal" style="font-size:var(--h2-size);">
+                                先做一坨<span style="color:var(--fire-orange);">垃圾</span>，再慢慢<span style="color:var(--fire-orange);">改进</span>
+                            </h2>
+                        </div>
+                    </div>
+                    <div class="slide-foot reveal-left"></div>
+                </div>
+            </section>
+
+            <!-- ===========================================
+                 SLIDE 12c-mvp — MVP 配图
+                 =========================================== -->
+            <section class="slide slide-content-slide slide-dark" data-slide="12c-mvp">
+                <div class="slide-content">
+                    <div class="reveal" style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;flex:1;">
+                        <img src="images/mvp-iteration.jpeg"
+                             alt="MVP"
+                             style="width:auto;max-width:80%;max-height:70%;border-radius:12px;display:block;object-fit:contain;">
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===========================================
+                 SLIDE 13 — CHAPTER III (Orange register)
+                 路径落地：三阶梯式课程体系
+                 =========================================== -->
+            <section class="slide slide-content-slide slide-dark" data-slide="9">
+                <div class="slide-content-chrome">
+                    <div class="content-body">
+                        <p class="reveal" style="font-family:var(--font-display);font-size:100px;font-weight:900;letter-spacing:0.02em;color:var(--fire-orange);text-align:center;margin-top:100px;margin-bottom:0px;">课程体系</p>
+                        <p class="reveal" style="font-family:var(--font-chrome);font-size:var(--lead-size);font-weight:400;letter-spacing:0.16em;color:var(--cream-hint);text-align:center;margin-bottom:20px;text-transform:uppercase;">CURRICULUM</p>
+                        <div style="display:flex;flex-direction:row;gap:var(--gap-lg);flex:1;align-items:center;">
+                            <div class="pillar-card reveal" style="transition-delay:0.1s;align-items:center;text-align:center;justify-content:center;">
+                                <div class="pillar-index" style="font-size:var(--h1-size);">L1</div>
+                                <div class="pillar-title" style="font-size:var(--h2-size);">捣鼓</div>
+                                <div style="font-family:var(--font-chrome);font-size:var(--lead-size);color:var(--cream-hint);letter-spacing:0.04em;margin-top:var(--gap-sm);">TINKER · 8 - 11</div>
+                            </div>
+                            <div class="pillar-card reveal" style="transition-delay:0.25s;align-items:center;text-align:center;justify-content:center;">
+                                <div class="pillar-index" style="font-size:var(--h1-size);">L2</div>
+                                <div class="pillar-title" style="font-size:var(--h2-size);">建造</div>
+                                <div style="font-family:var(--font-chrome);font-size:var(--lead-size);color:var(--cream-hint);letter-spacing:0.04em;margin-top:var(--gap-sm);">BUILD · 12 - 15</div>
+                            </div>
+                            <div class="pillar-card reveal" style="transition-delay:0.4s;align-items:center;text-align:center;justify-content:center;">
+                                <div class="pillar-index" style="font-size:var(--h1-size);">L3</div>
+                                <div class="pillar-title" style="font-size:var(--h2-size);">变现</div>
+                                <div style="font-family:var(--font-chrome);font-size:var(--lead-size);color:var(--cream-hint);letter-spacing:0.04em;margin-top:var(--gap-sm);">MONETIZE · 16+</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slide-foot reveal-left"></div>
+                </div>
+            </section>
+        <!--
+            <section class="slide slide-chapter slide-orange" data-slide="13">
+                <div class="slide-content">
+                    <p class="chapter-num-label reveal">PART 03</p>
+                    <h2 class="chapter-title reveal">
+                        路径落地
+                    </h2>
+                    <span class="rule-accent reveal" style="margin-top:var(--gap-md)"></span>
+                    <p class="chapter-desc reveal">
+                        三阶梯 · 从捣鼓到变现
+                    </p>
+                </div>
+            </section>
+        -->
+
+            <!-- ===========================================
+                 SLIDE 14 — CONTENT (Dark register)
+                 Level 1: Tinker — title + points
+                 =========================================== -->
+            <section class="slide slide-content-slide slide-dark" data-slide="14">
+                <div class="slide-content-chrome">
+                    <div class="content-body">
+                        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;text-align:center;">
+                            <!-- Tinker 大标题 -->
+                            <h2 class="headline reveal" style="font-size:var(--h1-size);color:var(--fire-orange);line-height:1.1;">
+                                Tinker
+                            </h2>
+                            <p class="body-text text-muted reveal" style="font-size:var(--h3-size);margin-top:var(--gap-sm);">
+                                捣鼓
+                            </p>
+                            <span class="rule-accent reveal" style="margin-top:var(--gap-lg);"></span>
+                            <!-- 引用 -->
+                            <p class="body-text reveal" style="font-size:var(--lead-size);color:var(--cream-hint);max-width:65%;margin-top:var(--gap-lg);line-height:1.8;font-style:italic;">
+                                “捣鼓、玩耍是思考的最高形式，那是头脑在和未知握手。”
+                            </p>
+                            <p class="body-text reveal" style="font-size:var(--body-size);color:var(--cream-hint);margin-top:var(--gap-sm);opacity:0.7;">
+                                —— 塞默·帕佩特 (LOGO语言之父，教育学家)
+                            </p>
+                        </div>
+                    </div>
+                    <div class="slide-foot reveal-left"></div>
+                </div>
+            </section>
+
+            <!-- ===========================================
+                SLIDE 15 — 作品展示 placeholder 1 (Dark register)
+                 Tinker 阶段 — 居中图片占位
+                 =========================================== -->
+            <section class="slide slide-content-slide slide-dark" data-slide="15">
+                <div class="slide-content">
+                    <div class="reveal" style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;flex:1;">
+                        <img src="images/comic.png"
+                             alt="Comic"
+                             style="width:auto;max-width:90%;max-height:85%;border-radius:12px;display:block;object-fit:contain;">
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===========================================
+                 SLIDE 15b — 作品展示 placeholder 2 (Dark register)
+                 Tinker 阶段 — 居中图片占位
+                 =========================================== -->
+            <section class="slide slide-content-slide slide-dark" data-slide="15b">
+                <div class="slide-content">
+                    <div class="reveal" style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;flex:1;">
+                        <img src="images/space-invaders.png"
+                             alt="Space Invaders"
+                             style="width:auto;max-width:90%;max-height:85%;border-radius:12px;display:block;object-fit:contain;">
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===========================================
+                 SLIDE 15c — 作品展示 placeholder 3 (Dark register)
+                 Tinker 阶段 — 居中图片占位
+                 =========================================== -->
+            <section class="slide slide-content-slide slide-dark" data-slide="15c">
+                <div class="slide-content">
+                    <div class="reveal" style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;flex:1;">
+                        <img src="images/personal-website.png"
+                             alt="Personal Website"
+                             style="width:auto;max-width:90%;max-height:85%;border-radius:12px;display:block;object-fit:contain;">
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===========================================
+                 SLIDE 16 — CONTENT (Dark register)
+                 Level 2: Build — title + points
+                 =========================================== -->
+            <section class="slide slide-content-slide slide-dark" data-slide="15">
+                <div class="slide-content-chrome">
+                    <div class="content-body">
+                        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;text-align:center;">
+                            <!-- Build 大标题 -->
+                            <h2 class="headline reveal" style="font-size:var(--h1-size);color:var(--fire-orange);line-height:1.1;">
+                                Build
+                            </h2>
+                            <p class="body-text text-muted reveal" style="font-size:var(--h3-size);margin-top:var(--gap-sm);">
+                                建造
+                            </p>
+                            <span class="rule-accent reveal" style="margin-top:var(--gap-lg);"></span>
+                            <!-- 引用 -->
+                            <p class="body-text reveal" style="font-size:var(--lead-size);color:var(--cream-hint);max-width:65%;margin-top:var(--gap-lg);line-height:1.8;font-style:italic;">
+                                “设计不只是外观和感觉，设计是它如何运作。”
+                            </p>
+                            <p class="body-text reveal" style="font-size:var(--body-size);color:var(--cream-hint);margin-top:var(--gap-sm);opacity:0.7;">
+                                —— 史蒂夫·乔布斯 (Steve Jobs)
+                            </p>
+                        </div>
+                    </div>
+                    <div class="slide-foot reveal-left"></div>
+                </div>
+            </section>
+
+            <!-- ===========================================
+                SLIDE 15e — 作品展示 placeholder 2 (Dark register)
+                 Build 阶段 — 居中图片占位
+                 =========================================== -->
+            <section class="slide slide-content-slide slide-dark" data-slide="15e">
+                <div class="slide-content">
+                    <div class="reveal" style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;flex:1;">
+                        <img src="images/three-layers.png.png"
+                             alt="Three Layers"
+                             style="width:auto;max-width:90%;max-height:85%;border-radius:12px;display:block;object-fit:contain;">
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===========================================
+                 SLIDE 15f — 作品展示 placeholder 3 (Dark register)
+                 Build 阶段 — 居中图片占位
+                 =========================================== -->
+            <section class="slide slide-content-slide slide-dark" data-slide="15f">
+                <div class="slide-content">
+                    <div class="reveal" style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;flex:1;">
+                        <img src="images/services.png"
+                             alt="Services"
+                             style="width:auto;max-width:90%;max-height:85%;border-radius:12px;display:block;object-fit:contain;">
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===========================================
+                 SLIDE 15g — 双图展示 (Dark register)
+                 Figma (左) + Cursor (右) 并排
+                 =========================================== -->
+            <section class="slide slide-content-slide slide-dark" data-slide="15g">
+                <div class="slide-content">
+                    <div class="reveal" style="display:flex;flex-direction:column;gap:var(--gap-md);width:100%;flex:1;align-items:center;justify-content:center;">
+                        <div style="flex:1;display:flex;align-items:center;justify-content:center;width:100%;">
+                            <img src="images/figma.png"
+                                 alt="Figma"
+                                 style="width:auto;max-width:60%;max-height:85%;border-radius:12px;display:block;object-fit:contain;">
+                        </div>
+                        <div style="flex:1;display:flex;align-items:center;justify-content:center;width:100%;margin-top:-60px;">
+                            <img src="images/cursor.png"
+                                 alt="Cursor"
+                                 style="width:auto;max-width:60%;max-height:85%;border-radius:12px;display:block;object-fit:contain;">
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="slide slide-content-slide slide-dark" data-slide="15e">
+                <div class="slide-content">
+                    <div class="reveal" style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;flex:1;">
+                        <img src="images/vibe-check.png"
+                             alt="Cursor logo"
+                             style="width:auto;max-width:90%;max-height:85%;border-radius:12px;display:block;object-fit:contain;">
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===========================================
+                 SLIDE 16 — CONTENT (Dark register)
+                 Level 3: Monetize — title + points
+                 =========================================== -->
+            <section class="slide slide-content-slide slide-dark" data-slide="16">
+                <div class="slide-content-chrome">
+                    <div class="content-body">
+                        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;text-align:center;">
+                            <!-- Monetize 大标题 -->
+                            <h2 class="headline reveal" style="font-size:var(--h1-size);color:var(--fire-orange);line-height:1.1;">
+                                Monetize
+                            </h2>
+                            <p class="body-text text-muted reveal" style="font-size:var(--h3-size);margin-top:var(--gap-sm);">
+                                变现
+                            </p>
+                            <span class="rule-accent reveal" style="margin-top:var(--gap-lg);"></span>
+                            <!-- 引用 -->
+                            <p class="body-text reveal" style="font-size:var(--lead-size);color:var(--cream-hint);max-width:65%;margin-top:var(--gap-lg);line-height:1.8;font-style:italic;">
+                                “创造人们真正渴望的东西，商业化自然水到渠成。”
+                            </p>
+                            <p class="body-text reveal" style="font-size:var(--body-size);color:var(--cream-hint);margin-top:var(--gap-sm);opacity:0.7;">
+                                —— 保罗·格雷厄姆 (Y Combinator 创始人)
+                            </p>
+                        </div>
+                    </div>
+                    <div class="slide-foot reveal-left"></div>
+                </div>
+            </section>
+
+            <!-- ===========================================
+                 SLIDE 16a — 作品展示 placeholder 1 (Dark register)
+                 Monetize 阶段 — 居中图片占位
+                 =========================================== -->
+            <section class="slide slide-content-slide slide-dark" data-slide="16a">
+                <div class="slide-content">
+                    <div class="reveal" style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;flex:1;">
+                        <img src="images/landing-page.jpeg"
+                             alt="Landing page"
+                             style="width:auto;max-width:90%;max-height:85%;border-radius:12px;display:block;object-fit:contain;">
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===========================================
+                 SLIDE 16b — 作品展示 placeholder 2 (Dark register)
+                 Monetize 阶段 — 居中图片占位
+                 =========================================== -->
+            <section class="slide slide-content-slide slide-dark" data-slide="16b">
+                <div class="slide-content">
+                    <div class="reveal" style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;flex:1;">
+                        <img src="images/dashboard.jpg"
+                             alt="Dashboard"
+                             style="width:auto;max-width:90%;max-height:85%;border-radius:12px;display:block;object-fit:contain;">
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===========================================
+                SLIDE 16c — 作品展示 placeholder 3 (Dark register)
+                 Monetize 阶段 — 居中图片占位
+                 =========================================== -->
+            <section class="slide slide-content-slide slide-dark" data-slide="16c">
+                <div class="slide-content">
+                    <div class="reveal" style="display:flex;flex-direction:row;gap:var(--gap-lg);width:100%;flex:1;align-items:center;justify-content:center;">
+                        <div style="flex:1;display:flex;align-items:center;justify-content:center;height:100%;">
+                            <img src="images/wechat-pay.png"
+                                 alt="WeChat Pay"
+                                 style="width:auto;max-width:80%;max-height:65%;border-radius:12px;display:block;object-fit:contain;">
+                        </div>
+                        <div style="flex:1;display:flex;align-items:center;justify-content:center;height:100%;">
+                            <img src="images/alipay.svg"
+                                 alt="Alipay"
+                                 style="width:auto;max-width:35%;max-height:65%;border-radius:12px;display:block;object-fit:contain;">
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===========================================
+                 SLIDE 19 — CONTENT (Dark register)
+                 Final message — minimal
+                 =========================================== -->
+            <section class="slide slide-content-slide slide-dark" data-slide="19">
+                <div class="slide-content-chrome">
+                    <div class="content-body">
+                        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;text-align:center;">
+                            <h2 class="headline reveal" style="font-size:var(--display-size);line-height:1.15;">
+                                潜力<br><span style="color:var(--fire-orange);">没有任何边界</span>
+                            </h2>
+                            <span class="rule-accent reveal" style="margin-top:var(--gap-lg);"></span>
+                        </div>
+                    </div>
+                    <div class="slide-foot reveal-left"></div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- ===========================================
+         EXTERNAL NAV CONTROLS
+         =========================================== -->
+    <div class="deck-controls" id="deckControls">
+        <div id="navDots"></div>
+        <span class="slide-counter" id="slideCounter">01 / 20</span>
+    </div>
+
+    <script>
+        /* ===========================================
+           SLIDE PRESENTATION CONTROLLER
+           Handles: navigation, stage scaling, touch, wheel
+           =========================================== */
+        class SlidePresentation {
+            constructor() {
+                this.slides = document.querySelectorAll('.slide');
+                this.totalSlides = this.slides.length;
+                this.currentIndex = 0;
+                this.stage = document.getElementById('deckStage');
+                this.isTransitioning = false;
+
+                this.setupStageScale();
+                this.setupKeyboardNav();
+                this.setupTouchNav();
+                this.setupWheelNav();
+                this.setupNavDots();
+                this.showSlide(0);
+                this.setupHashNav();        /* URL #10 → 跳转第 10 页 */
+                this.setupQuickJump();      /* 数字键输入 → 回车跳转 */
+
+                /* Inline editing setup */
+                this.setupInlineEditing();
+            }
+
+            /* ---- Stage scaling (fixed 16:9) ---- */
+            setupStageScale() {
+                const scale = () => {
+                    const w = window.innerWidth;
+                    const h = window.innerHeight;
+                    const factor = Math.min(w / 1920, h / 1080);
+                    const x = (w - 1920 * factor) / 2;
+                    const y = (h - 1080 * factor) / 2;
+                    this.stage.style.transform = `translate(${x}px, ${y}px) scale(${factor})`;
+                };
+                scale();
+                let resizeTimer;
+                window.addEventListener('resize', () => {
+                    clearTimeout(resizeTimer);
+                    resizeTimer = setTimeout(scale, 100);
+                });
+            }
+
+            /* ---- Navigation: show slide at index ---- */
+            showSlide(index) {
+                if (this.isTransitioning) return;
+                if (index < 0 || index >= this.totalSlides) return;
+                if (index === this.currentIndex) {
+                    /* Re-trigger animations */
+                    this.slides.forEach((s, i) => {
+                        s.classList.toggle('active', i === index);
+                        s.classList.toggle('visible', i === index);
+                    });
+                    return;
+                }
+
+                this.isTransitioning = true;
+                this.currentIndex = index;
+
+                this.slides.forEach((slide, i) => {
+                    slide.classList.toggle('active', i === index);
+                    slide.classList.toggle('visible', i === index);
+                });
+
+                this.updateNavDots();
+                this.updateCounter();
+
+                setTimeout(() => {
+                    this.isTransitioning = false;
+                }, 1500);
+            }
+
+            /* ---- Go to slide by number (1-based) ---- */
+            goToSlide(num) {
+                this.showSlide(num - 1);
+            }
+
+            /* ---- Next / Previous ---- */
+            next() { this.showSlide(this.currentIndex + 1); }
+            prev() { this.showSlide(this.currentIndex - 1); }
+
+            /* ---- Keyboard nav ---- */
+            setupKeyboardNav() {
+                document.addEventListener('keydown', (e) => {
+                    /* Skip if editing text */
+                    if (document.activeElement && document.activeElement.getAttribute('contenteditable')) {
+                        return;
+                    }
+                    switch (e.key) {
+                        case 'ArrowRight':
+                        case 'ArrowDown':
+                        case ' ':
+                        case 'PageDown':
+                            e.preventDefault();
+                            this.next();
+                            break;
+                        case 'ArrowLeft':
+                        case 'ArrowUp':
+                        case 'PageUp':
+                            e.preventDefault();
+                            this.prev();
+                            break;
+                        case 'Home':
+                            e.preventDefault();
+                            this.showSlide(0);
+                            break;
+                        case 'End':
+                            e.preventDefault();
+                            this.showSlide(this.totalSlides - 1);
+                            break;
+                    }
+                });
+            }
+
+            /* ---- Touch / swipe support ---- */
+            setupTouchNav() {
+                let startX = 0;
+                let startY = 0;
+                let isSwiping = false;
+
+                this.stage.addEventListener('touchstart', (e) => {
+                    const touch = e.changedTouches[0];
+                    startX = touch.clientX;
+                    startY = touch.clientY;
+                    isSwiping = true;
+                }, { passive: true });
+
+                this.stage.addEventListener('touchend', (e) => {
+                    if (!isSwiping) return;
+                    isSwiping = false;
+                    const touch = e.changedTouches[0];
+                    const dx = touch.clientX - startX;
+                    const dy = touch.clientY - startY;
+
+                    /* Only trigger if horizontal swipe is dominant */
+                    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 60) {
+                        if (dx < 0) this.next();
+                        else this.prev();
+                    }
+                }, { passive: true });
+            }
+
+            /* ---- Mouse wheel ---- */
+            setupWheelNav() {
+                let wheelTimeout = false;
+                this.stage.addEventListener('wheel', (e) => {
+                    /* Only vertical scroll */
+                    if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
+                    if (wheelTimeout) return;
+                    wheelTimeout = true;
+                    setTimeout(() => { wheelTimeout = false; }, 1500);
+
+                    if (e.deltaY > 0) this.next();
+                    else this.prev();
+                }, { passive: true });
+            }
+
+            /* ---- Nav dots ---- */
+            setupNavDots() {
+                const container = document.getElementById('navDots');
+                for (let i = 0; i < this.totalSlides; i++) {
+                    const dot = document.createElement('button');
+                    dot.className = 'nav-dot' + (i === 0 ? ' active' : '');
+                    dot.setAttribute('aria-label', `跳转到幻灯片 ${i + 1}`);
+                    dot.addEventListener('click', () => { this.showSlide(i); });
+                    container.appendChild(dot);
+                }
+            }
+
+            updateNavDots() {
+                const dots = document.querySelectorAll('.nav-dot');
+                dots.forEach((dot, i) => {
+                    dot.classList.toggle('active', i === this.currentIndex);
+                });
+            }
+
+            updateCounter() {
+                const counter = document.getElementById('slideCounter');
+                const num = String(this.currentIndex + 1).padStart(2, '0');
+                const total = String(this.totalSlides).padStart(2, '0');
+                counter.textContent = `${num} / ${total}`;
+            }
+
+            /* ---- URL hash navigation (#5 → 跳到第 5 页) ---- */
+            setupHashNav() {
+                if (window.location.hash) {
+                    const num = parseInt(window.location.hash.replace('#', ''), 10);
+                    if (!isNaN(num) && num >= 1 && num <= this.totalSlides) {
+                        setTimeout(() => this.goToSlide(num), 150);
+                    }
+                }
+            }
+
+            /* ---- Quick jump: type a number + Enter to go to that slide ---- */
+            setupQuickJump() {
+                this._jumpBuffer = '';
+                this._jumpTimer = null;
+
+                const overlay = document.createElement('div');
+                overlay.id = 'jumpOverlay';
+                overlay.style.cssText = 'position:fixed;bottom:64px;left:50%;transform:translateX(-50%);z-index:10002;background:rgba(17,17,17,0.92);color:#F0ECE5;font-family:IBM Plex Mono,monospace;font-size:22px;padding:6px 18px;border-radius:6px;border:1px solid #282826;opacity:0;transition:opacity 0.15s;pointer-events:none;';
+                document.body.appendChild(overlay);
+
+                document.addEventListener('keydown', (e) => {
+                    /* Ignore when editing text */
+                    if (document.activeElement && document.activeElement.getAttribute('contenteditable')) return;
+
+                    if (e.key === 'Escape') {
+                        this._jumpBuffer = '';
+                        overlay.style.opacity = '0';
+                        return;
+                    }
+
+                    if (e.key >= '0' && e.key <= '9') {
+                        this._jumpBuffer += e.key;
+                        overlay.textContent = `→ ${this._jumpBuffer}`;
+                        overlay.style.opacity = '1';
+                        clearTimeout(this._jumpTimer);
+                        this._jumpTimer = setTimeout(() => {
+                            this._jumpBuffer = '';
+                            overlay.style.opacity = '0';
+                        }, 2000);
+                        e.preventDefault();
+                    } else if (e.key === 'Enter' && this._jumpBuffer) {
+                        const num = parseInt(this._jumpBuffer, 10);
+                        if (num >= 1 && num <= this.totalSlides) {
+                            this.goToSlide(num);
+                        }
+                        this._jumpBuffer = '';
+                        overlay.style.opacity = '0';
+                        e.preventDefault();
+                    }
+                });
+            }
+
+            /* ===========================================
+               INLINE EDITING
+               =========================================== */
+            setupInlineEditing() {
+                this.editMode = false;
+                const toggleBtn = document.getElementById('editToggle');
+                const saveBtn = document.getElementById('editSaveBtn');
+                const hotzone = document.getElementById('editHotzone');
+                let hideTimeout = null;
+
+                /* Make all text elements editable */
+                const textElements = this.stage.querySelectorAll(
+                    '.cover-title, .cover-subtitle, .chapter-title, .chapter-desc, ' +
+                    '.statement-text, .statement-sub, .end-title, .end-sub, ' +
+                    '.headline, .body-text, .stat-label, .stat-value, .kicker, ' +
+                    '.stat-note, .text-muted'
+                );
+
+                const toggleEditMode = () => {
+                    this.editMode = !this.editMode;
+                    toggleBtn.classList.toggle('active', this.editMode);
+                    saveBtn.classList.toggle('show', this.editMode);
+
+                    if (this.editMode) {
+                        this.stage.classList.add('edit-mode');
+                        textElements.forEach(el => {
+                            el.setAttribute('contenteditable', 'true');
+                            el.classList.add('editable');
+                            /* Trigger save on Ctrl+Enter or blur */
+                            el.addEventListener('keydown', (e) => {
+                                if (e.ctrlKey && e.key === 'Enter') {
+                                    e.preventDefault();
+                                    saveToLocalStorage();
+                                }
+                            });
+                        });
+                    } else {
+                        this.stage.classList.remove('edit-mode');
+                        textElements.forEach(el => {
+                            el.removeAttribute('contenteditable');
+                            el.classList.remove('editable');
+                        });
+                        saveToLocalStorage();
+                    }
+                };
+
+                const saveToLocalStorage = () => {
+                    try {
+                        const slides = [];
+                        this.slides.forEach(slide => {
+                            const texts = {};
+                            const els = slide.querySelectorAll('[contenteditable]');
+                            els.forEach(el => {
+                                /* Generate a unique key based on class and content */
+                                const cls = Array.from(el.classList).filter(c => c !== 'editable' && c !== 'reveal' && c !== 'reveal-left' && c !== 'reveal-scale').join('.');
+                                const idx = Array.from(slide.querySelectorAll('[contenteditable]')).indexOf(el);
+                                texts[cls + '-' + idx] = el.innerHTML;
+                            });
+                            slides.push(texts);
+                        });
+                        localStorage.setItem('broadside-deck-content', JSON.stringify(slides));
+                        saveBtn.textContent = '✓ 已保存';
+                        setTimeout(() => { saveBtn.textContent = '💾 保存'; }, 2000);
+                    } catch (e) {
+                        console.warn('Save failed:', e);
+                    }
+                };
+
+                /* Load saved content */
+                try {
+                    const saved = localStorage.getItem('broadside-deck-content');
+                    if (saved) {
+                        const data = JSON.parse(saved);
+                        if (data.length === this.totalSlides) {
+                            this.slides.forEach((slide, i) => {
+                                const texts = data[i];
+                                const els = slide.querySelectorAll('[contenteditable]');
+                                let idx = 0;
+                                els.forEach(el => {
+                                    const cls = Array.from(el.classList).filter(c => c !== 'editable' && c !== 'reveal' && c !== 'reveal-left' && c !== 'reveal-scale').join('.');
+                                    const key = cls + '-' + idx;
+                                    if (texts[key]) {
+                                        el.innerHTML = texts[key];
+                                    }
+                                    idx++;
+                                });
+                            });
+                        }
+                    }
+                } catch (e) { /* ignore */ }
+
+                /* ---- Hotzone hover with 400ms delay ---- */
+                hotzone.addEventListener('mouseenter', () => {
+                    clearTimeout(hideTimeout);
+                    if (!this.editMode) toggleBtn.classList.add('show');
+                });
+                hotzone.addEventListener('mouseleave', () => {
+                    hideTimeout = setTimeout(() => {
+                        if (!this.editMode) toggleBtn.classList.remove('show');
+                    }, 400);
+                });
+                toggleBtn.addEventListener('mouseenter', () => {
+                    clearTimeout(hideTimeout);
+                });
+                toggleBtn.addEventListener('mouseleave', () => {
+                    hideTimeout = setTimeout(() => {
+                        if (!this.editMode) toggleBtn.classList.remove('show');
+                    }, 400);
+                });
+
+                /* Click handlers */
+                hotzone.addEventListener('click', toggleEditMode);
+                toggleBtn.addEventListener('click', toggleEditMode);
+                saveBtn.addEventListener('click', saveToLocalStorage);
+
+                /* Keyboard shortcut: E key */
+                document.addEventListener('keydown', (e) => {
+                    if ((e.key === 'e' || e.key === 'E') &&
+                        !e.target.getAttribute('contenteditable') &&
+                        !e.ctrlKey && !e.metaKey) {
+                        e.preventDefault();
+                        toggleEditMode();
+                    }
+                });
+
+                /* Expose for debugging */
+                window.__editor = {
+                    toggleEditMode,
+                    saveToLocalStorage,
+                    isActive: () => this.editMode
+                };
+            }
+        }
+
+        /* ===========================================
+           INIT
+           =========================================== */
+        document.addEventListener('DOMContentLoaded', () => {
+            new SlidePresentation();
+        });
+    </script>
+
+</body>
+</html>

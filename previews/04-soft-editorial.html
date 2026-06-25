@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<title>Soft Editorial — AI少年创造营</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Work+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<script src="deck-stage.js"></script>
+<style>
+  :root {
+    --paper:    #F2EEDF;     /* warm cream page */
+    --paper-2:  #ECE6D2;
+    --ink:      #2A241B;     /* warm near-black */
+    --ink-soft: #5C5345;
+    --pink:     #E1A4C2;     /* dusty pink */
+    --lemon:    #D6DD63;     /* chartreuse */
+    --blush:    #E8C9B6;     /* soft peach */
+    --sage:     #B7C7A8;     /* sage */
+    --lilac:    #C9BEDC;     /* lilac */
+  }
+  html, body { margin:0; padding:0; background:#1a1a1a; }
+  body { font-family: "Work Sans", "Helvetica Neue", Helvetica, Arial, sans-serif; color: var(--ink); }
+  deck-stage { background: #1a1a1a; }
+
+  section.slide {
+    background: var(--paper);
+    color: var(--ink);
+    overflow: hidden;
+    position: relative;
+  }
+
+  .eyebrow {
+    position: absolute;
+    top: 60px; left: 80px;
+    font-family: "Work Sans", sans-serif;
+    font-size: 28px;
+    font-weight: 400;
+    color: var(--ink);
+    letter-spacing: -0.005em;
+  }
+  .footer {
+    position: absolute;
+    left: 80px; right: 80px; bottom: 50px;
+    display: flex;
+    justify-content: space-between;
+    font-family: "Cormorant Garamond", "Garamond", serif;
+    font-size: 26px;
+    color: var(--ink-soft);
+  }
+  .pagedot {
+    position: absolute;
+    right: 80px; top: 60px;
+    font-family: "Cormorant Garamond", serif;
+    font-size: 26px;
+    color: var(--ink-soft);
+  }
+
+  h1, h2, h3, p { margin: 0; }
+  .serif      { font-family: "Cormorant Garamond", "Garamond", serif; font-weight: 500; }
+  .display {
+    font-family: "Cormorant Garamond", serif;
+    font-weight: 500;
+    font-size: 188px;
+    line-height: 0.95;
+    letter-spacing: -0.015em;
+  }
+
+  /* COVER */
+  .s-cover .stack {
+    position: absolute;
+    left: 80px; right: 80px; top: 50%;
+    transform: translateY(-50%);
+    display: flex; flex-direction: column; gap: 36px;
+  }
+  .s-cover .kicker {
+    font-family: "Cormorant Garamond", serif;
+    font-size: 38px;
+    color: var(--ink-soft);
+  }
+  .s-cover h1 {
+    font-family: "Cormorant Garamond", serif;
+    font-weight: 500;
+    font-size: 232px;
+    line-height: 0.92;
+    letter-spacing: -0.02em;
+  }
+  .s-cover h1 em { font-weight: 400; }
+  .s-cover .lede {
+    font-size: 30px;
+    line-height: 1.4;
+    max-width: 60ch;
+    color: var(--ink-soft);
+  }
+  .s-cover .swatches {
+    position: absolute;
+    right: 80px; top: 80px;
+    display: flex; gap: 14px;
+  }
+  .s-cover .swatches i {
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    display: block;
+  }
+</style>
+</head>
+<body>
+
+<deck-stage width="1920" height="1080">
+
+  <!-- ============== 1. COVER ================================== -->
+  <section class="slide s-cover" data-label="01 Cover">
+    <div class="swatches" aria-hidden="true">
+      <i style="background:var(--pink)"></i>
+      <i style="background:var(--lemon)"></i>
+      <i style="background:var(--blush)"></i>
+      <i style="background:var(--sage)"></i>
+    </div>
+    <div class="stack">
+      <div class="kicker">课程发布会 · 2026</div>
+      <h1>AI少年<br />创造营</h1>
+      <div class="lede">用温暖的设计语言，开启 AI 创造的无限可能。<br />Youth Creation Camp — where ideas take flight.</div>
+    </div>
+    <div class="footer">
+      <span>Soft Editorial</span>
+      <span>01 / 01</span>
+    </div>
+  </section>
+
+</deck-stage>
+
+</body>
+</html>

@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<title>Neo-Grid Bold — AI少年创造营</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<script src="deck-stage.js"></script>
+<style>
+  :root {
+    --bg: #ECECE8;
+    --ink: #0A0A0A;
+    --paper: #F5F4EF;
+    --accent: #E6FF3D;        /* signature neon yellow */
+    --line: #0A0A0A;
+    --muted: #8A8A85;
+  }
+  html, body { margin: 0; padding: 0; background: #1a1a1a; }
+  body { font-family: "Space Grotesk", "Helvetica Neue", Helvetica, Arial, sans-serif; color: var(--ink); }
+  deck-stage { background: #1a1a1a; }
+
+  section.slide {
+    background: var(--bg);
+    color: var(--ink);
+    overflow: hidden;
+  }
+  .frame {
+    position: absolute; inset: 40px;
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    grid-template-rows: repeat(8, 1fr);
+    gap: 12px;
+  }
+  .card {
+    background: var(--paper);
+    position: relative;
+    overflow: hidden;
+  }
+  .card.ink   { background: var(--ink);   color: var(--paper); }
+  .card.lemon { background: var(--accent); color: var(--ink); }
+
+  .pagenum {
+    position: absolute;
+    left: 0; bottom: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 24px;
+    padding: 14px 22px;
+    letter-spacing: 0.04em;
+  }
+
+  h1, h2, h3, p { margin: 0; }
+  .title {
+    font-weight: 700;
+    font-size: 88px;
+    line-height: 0.95;
+    letter-spacing: -0.015em;
+    text-transform: uppercase;
+  }
+  .body {
+    font-size: 28px;
+    line-height: 1.35;
+    font-weight: 400;
+  }
+  .label {
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 24px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink);
+    opacity: 0.7;
+  }
+
+  /* --- COVER --- */
+  .s-cover .panel-photo-l { grid-column: 1 / span 3; grid-row: 1 / span 8; background: #0a0a0a; position: relative; overflow: hidden; }
+  .s-cover .panel-photo-l .ph { position: absolute; inset: 0;
+    background:
+      radial-gradient(120% 80% at 30% 30%, #2a2a2a 0%, #0a0a0a 70%),
+      repeating-linear-gradient(135deg, rgba(255,255,255,.04) 0 2px, transparent 2px 8px);
+  }
+  .s-cover .panel-mid  { grid-column: 4 / span 5; grid-row: 1 / span 5; background: var(--accent); position: relative; }
+  .s-cover .panel-titletile { grid-column: 4 / span 5; grid-row: 6 / span 3; background: var(--accent); position: relative; }
+  .s-cover .panel-photo-r { grid-column: 9 / span 4; grid-row: 1 / span 5; background:#111; position: relative; overflow: hidden; }
+  .s-cover .panel-photo-r .ph { position: absolute; inset: 0;
+    background:
+      radial-gradient(80% 60% at 60% 40%, #1f1f1f 0%, #0b0b0b 80%),
+      repeating-linear-gradient(45deg, rgba(255,255,255,.05) 0 2px, transparent 2px 8px);
+  }
+  .s-cover .panel-cap   { grid-column: 9 / span 4; grid-row: 6 / span 3; background: var(--paper); position: relative; }
+  .s-cover .qr {
+    position: absolute; top: 28px; left: 28px;
+    width: 90px; height: 90px; background: var(--ink);
+    display: grid; grid-template-columns: repeat(5, 1fr); grid-template-rows: repeat(5, 1fr); gap: 0;
+  }
+  .s-cover .qr i { background: var(--ink); }
+  .s-cover .qr i.k { background: var(--accent); }
+  .s-cover .title-block {
+    position: absolute; left: 40px; right: 40px; bottom: 40px;
+  }
+  .s-cover .meta-l {
+    position: absolute; left: 40px; bottom: 40px;
+    font-family: "JetBrains Mono", monospace; font-size: 24px; line-height: 1.4;
+    letter-spacing: .04em;
+  }
+  .s-cover .blockmark {
+    position: absolute; right: 40px; bottom: 40px;
+    width: 56px; height: 56px;
+    display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 4px;
+  }
+  .s-cover .blockmark span:nth-child(1) { background: var(--ink); }
+  .s-cover .blockmark span:nth-child(2) { background: transparent; }
+  .s-cover .blockmark span:nth-child(3) { background: transparent; }
+  .s-cover .blockmark span:nth-child(4) { background: var(--ink); }
+</style>
+</head>
+<body>
+
+<deck-stage width="1920" height="1080">
+
+  <!-- ============== 1. COVER ================================== -->
+  <section class="slide s-cover active" data-label="01 Cover">
+    <div class="frame">
+      <div class="panel-photo-l">
+        <div class="ph"></div>
+      </div>
+      <div class="panel-mid">
+        <div class="qr" aria-hidden="true">
+          <i></i><i class="k"></i><i></i><i class="k"></i><i></i>
+          <i class="k"></i><i></i><i class="k"></i><i></i><i class="k"></i>
+          <i></i><i class="k"></i><i></i><i class="k"></i><i></i>
+          <i class="k"></i><i></i><i class="k"></i><i></i><i class="k"></i>
+          <i></i><i class="k"></i><i></i><i class="k"></i><i></i>
+        </div>
+      </div>
+      <div class="panel-titletile">
+        <div class="title-block">
+          <h1 class="title">AI少年<br />创造营</h1>
+        </div>
+        <div class="blockmark" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+      </div>
+      <div class="panel-photo-r">
+        <div class="ph"></div>
+      </div>
+      <div class="panel-cap">
+        <div class="meta-l">
+          课程发布会 · 2026
+        </div>
+      </div>
+    </div>
+    <div class="pagenum">01 / 01</div>
+  </section>
+
+</deck-stage>
+
+</body>
+</html>
