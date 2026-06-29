@@ -166,25 +166,47 @@
             }
             .deck-stage {
                 position: static;
-                width: auto;
-                height: auto;
+                width: 1920px !important;
+                height: auto !important;
                 transform: none !important;
                 background: none;
             }
             .slide {
-                position: relative;
+                position: relative !important;
                 display: block !important;
                 visibility: visible !important;
                 opacity: 1 !important;
                 pointer-events: auto !important;
-                width: 1920px;
-                height: 1080px;
+                width: 1920px !important;
+                height: 1080px !important;
+                overflow: visible !important;
                 break-after: page;
                 page-break-after: always;
             }
             .slide:last-child {
                 break-after: auto;
                 page-break-after: auto;
+            }
+            .slide-content,
+            .slide-content-chrome {
+                position: relative !important;
+                inset: auto !important;
+                width: 100%;
+                height: 100%;
+                padding: var(--pad-y) var(--pad-x);
+            }
+            .slide-content-chrome .content-body {
+                min-height: 800px;
+            }
+            .slide-dark {
+                background: var(--ink-black) !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            .slide-orange {
+                background: var(--fire-orange) !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
             }
             .deck-controls {
                 display: none !important;
@@ -967,12 +989,14 @@
                         <div style="display:flex;flex-direction:row;gap:var(--pad-x);flex:1;align-items:center;">
                             <div style="flex:1;display:flex;flex-direction:column;align-items:center;text-align:center;">
                                 <div style="font-family:var(--font-mono);font-size:72px;font-weight:700;color:var(--fire-orange);line-height:1;letter-spacing:-0.02em;">01</div>
-                                <div class="reveal" style="font-size:var(--h2-size);font-family:var(--font-display);font-weight:900;color:var(--cream);margin-top:var(--gap-md);">时间的限制</div>
+                                <div class="reveal" style="font-size:var(--h2-size);font-family:var(--font-display);font-weight:900;color:var(--cream);margin-top:var(--gap-md);">时间限制</div>
+                                <span class="rule-accent reveal" style="margin-top:var(--gap-sm);"></span>
                             </div>
                             <div style="width:1px;height:200px;background:var(--border-dark);flex-shrink:0;"></div>
                             <div style="flex:1;display:flex;flex-direction:column;align-items:center;text-align:center;">
                                 <div style="font-family:var(--font-mono);font-size:72px;font-weight:700;color:var(--fire-orange);line-height:1;letter-spacing:-0.02em;">02</div>
-                                <div class="reveal" style="font-size:var(--h2-size);font-family:var(--font-display);font-weight:900;color:var(--cream);margin-top:var(--gap-md);">门槛的限制</div>
+                                <div class="reveal" style="font-size:var(--h2-size);font-family:var(--font-display);font-weight:900;color:var(--cream);margin-top:var(--gap-md);">门槛限制</div>
+                                <span class="rule-accent reveal" style="margin-top:var(--gap-sm);"></span>
                             </div>
                         </div>
                     </div>
@@ -986,7 +1010,6 @@
                  =========================================== -->
             <section class="slide slide-dark" data-slide="p2-2b">
                 <div class="slide-content" style="align-items:center;text-align:center;">
-                    <p class="chapter-num-label reveal" style="margin-bottom:var(--gap-md);color:var(--cream-hint);">COURSE LAUNCH</p>
                     <h2 class="headline reveal" style="font-size:var(--h1-size);line-height:1.15;max-width:100%;color:var(--fire-orange);">
                         Future Founder Lab
                     </h2>
@@ -996,6 +1019,7 @@
                     </p>
                 </div>
             </section>
+
 
             <!-- ===========================================
                  SLIDE — 线上常规直播课 (Dark register)
@@ -1632,6 +1656,19 @@
                             您的浏览器不支持视频播放。
                         </video>
                     </div>
+                </div>
+            </section>
+
+            <!-- ===========================================
+                 SLIDE — Show, don't tell (Dark register)
+                 Statement
+                 =========================================== -->
+            <section class="slide slide-dark" data-slide="show-dont-tell">
+                <div class="slide-content" style="align-items:center;text-align:center;">
+                    <h2 class="headline reveal" style="font-size:var(--h1-size);line-height:1.15;max-width:100%;color:var(--cream);white-space:nowrap;">
+                        <span style="color:var(--fire-orange);">Show</span>, don't <span style="color:var(--fire-orange);">tell</span>
+                    </h2>
+                    <span class="rule-accent reveal" style="margin-top:var(--gap-lg);"></span>
                 </div>
             </section>
 
