@@ -295,7 +295,6 @@
             justify-content: space-between;
             align-items: center;
             padding-bottom: var(--gap-sm);
-            border-bottom: 1px solid var(--border-dark);
             margin-bottom: var(--gap-md);
             height: 36px;
         }
@@ -319,40 +318,19 @@
 
         .slide-foot {
             padding-top: var(--gap-sm);
-            border-top: 1px solid var(--border-dark);
             margin-top: var(--gap-md);
             height: 36px;
         }
 
-        /* ---- 全局顶部和底部分割线（每张幻灯片自动拥有） ---- */
-        .slide-content {
-            border-top: 1px solid var(--border-dark);
-            border-bottom: 1px solid var(--border-dark);
-        }
-        .slide-content-chrome {
-            border-top: 1px solid var(--border-dark);
-            /* 底部已由 slide-foot 提供，不再重复 */
-        }
+        /* ---- 全局顶部和底部分割线已移除 ---- */
         /* Orange register 配色 */
-        .slide-orange .slide-content,
-        .slide-orange .slide-content-chrome {
-            border-color: var(--ink-on-orange-border);
-        }
-
         /* Orange-register chrome overrides */
-        .slide-orange .slide-chrome {
-            border-bottom: 1px solid var(--ink-on-orange-border);
-        }
         .slide-orange .slide-chrome .kicker {
             color: var(--ink-on-orange-hint);
         }
         .slide-orange .slide-chrome .page-num {
             color: var(--ink-on-orange-faint);
         }
-        .slide-orange .slide-foot {
-            border-top: 1px solid var(--ink-on-orange-border);
-        }
-
         /* Declarative slides: suppress chrome */
         .slide-cover .slide-chrome,
         .slide-cover .slide-foot,
